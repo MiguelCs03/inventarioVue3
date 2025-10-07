@@ -16,7 +16,7 @@ class PermissionSeeder extends Seeder
             ['name' => 'Roles', 'subject' => 'apps-roles'],
             ['name' => 'Proveedores', 'subject' => 'proveedores'],
             ['name' => 'Compras', 'subject' => 'compras'],
-            // Agrega más secciones según vayas creando páginas
+            // Agrega más secciones según se vaya creando páginas
         ];
 
         foreach ($sections as $sec) {
