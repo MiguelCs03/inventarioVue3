@@ -9,7 +9,7 @@ class Menu extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name', 'icon', 'route', 'is_active', 'order'
+        'name', 'icon', 'route', 'section', 'is_active', 'order'
     ];
 
     public function submenus()

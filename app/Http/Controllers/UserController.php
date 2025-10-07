@@ -92,4 +92,58 @@ class UserController extends Controller
 
         return response()->json(['message' => 'Usuario activado']);
     }
+
+    // Obtener perfil del usuario autenticado
+    public function profile(Request $request)
+    {
+        $user = $request->user();
+        return response()->json($user->load('roles'));
+    }
+
+    // Actualizar perfil del usuario autenticado
+    public function updateProfile(Request $request)
+    {
+        $user = $request->user();
+        
+        $validated = $request->validate([
+            'name' => 'sometimes|string|max:255',
+            'email' => 'sometimes|email|unique:users,email,' . $user->id,
+            'phone' => 'nullable|string|max:20',
+            'address' => 'nullable|string|max:500',
+            'fecha_nacimiento' => 'nullable|date',
+        ]);
+
+        $user->update($validated);
+
+        return response()->json([
+            'message' => 'Perfil actualizado exitosamente',
+            'user' => $user->fresh()
+        ]);
+    }
+
+    // Cambiar contraseña del usuario autenticado
+    public function changePassword(Request $request)
+    {
+        $user = $request->user();
+        
+        $validated = $request->validate([
+            'current_password' => 'required|string',
+            'new_password' => 'required|string|min:6|confirmed',
+        ]);
+
+        // Verificar la contraseña actual
+        if (!Hash::check($validated['current_password'], $user->password)) {
+            return response()->json([
+                'message' => 'La contraseña actual es incorrecta',
+                'errors' => ['current_password' => ['La contraseña actual es incorrecta']]
+            ], 422);
+        }
+
+        // Actualizar la contraseña
+        $user->update([
+            'password' => Hash::make($validated['new_password'])
+        ]);
+
+        return response()->json(['message' => 'Contraseña actualizada exitosamente']);
+    }
 }

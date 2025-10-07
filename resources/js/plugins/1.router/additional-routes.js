@@ -37,7 +37,19 @@ export const routes = [
     name: 'apps-usuarios',
     component: () => import('@/pages/apps-usuarios.vue'),
     meta: {
-      section: 'usuarios', // Sección requerida para acceder
+      section: 'apps-usuarios', // Sección requerida para acceder
+      action: 'read',
+      subject: 'apps-usuarios',
+    },
+  },
+  {
+    path: '/apps-roles',
+    name: 'apps-roles',
+    component: () => import('@/pages/apps-roles.vue'),
+    meta: {
+      section: 'apps-roles',
+      action: 'read',
+      subject: 'apps-roles',
     },
   },
   {
@@ -53,6 +65,11 @@ export const routes = [
     path: '/dashboard-inicio',
     name: 'dashboard-inicio',
     component: () => import('@/pages/dashboard-inicio.vue'),
+    meta: {
+      section: 'dashboard-inicio', // Agregar sección
+      action: 'read',
+      subject: 'dashboard-inicio',
+    },
   },
   {
     path: '/apps/email/label/:label',
@@ -69,6 +86,8 @@ export const routes = [
     component: () => import('@/pages/proveedores.vue'),
     meta: {
       section: 'proveedores', // Sección requerida
+      action: 'read',
+      subject: 'proveedores',
       navActiveLink: 'proveedores',
       layoutWrapperClasses: 'layout-content-height-fixed',
     },
@@ -79,8 +98,20 @@ export const routes = [
     component: () => import('@/pages/compras.vue'),
     meta: {
       section: 'compras', // Sección requerida
+      action: 'read',
+      subject: 'compras',
       navActiveLink: 'compras',
       layoutWrapperClasses: 'layout-content-height-fixed',
+    },
+  },
+  {
+    path: '/perfil',
+    name: 'perfil',
+    component: () => import('@/pages/perfil.vue'),
+    meta: {
+      // No requiere sección específica - todos los usuarios pueden acceder a su perfil
+      action: 'read',
+      subject: 'perfil',
     },
   },
 ]

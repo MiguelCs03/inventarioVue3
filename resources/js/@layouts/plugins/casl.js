@@ -36,15 +36,38 @@ export const canViewNavMenuGroup = item => {
 }
 export const canNavigate = to => {
   const ability = useAbility()
-
-  // Get the most specific route (last one in the matched array)
+  
+  // Si la ruta no tiene requisitos específicos de permisos, permitir acceso
   const targetRoute = to.matched[to.matched.length - 1]
+  if (!targetRoute?.meta?.action && !targetRoute?.meta?.subject)
+    return true
+    
+  // Get the most specific route (last one in the matched array)
+  
+  // Si la ruta tiene section, verificar si el usuario tiene permisos para esa sección
+  if (targetRoute?.meta?.section) {
+    const section = targetRoute.meta.section.toLowerCase()
+    // Verificar si el usuario tiene permisos para esta sección
+    const userData = useCookie('userData').value || {}
+    const allowedSections = (userData.allowedSections || [])
+      .map(s => typeof s === 'string' ? s.toLowerCase().trim() : '')
+      .filter(s => s)
+    
+    // También verificar si es admin
+    const userRoles = (userData.roles || [])
+      .map(r => typeof r === 'string' ? r.toLowerCase().trim() : '')
+      .filter(r => r)
+    const isAdmin = userRoles.includes('admin')
+    
+    // Si es admin o tiene la sección permitida
+    if (isAdmin || allowedSections.includes(section))
+      return true
+  }
 
-  // If the target route has specific permissions, check those first
+  // Si tiene action y subject específicos, verificar con CASL
   if (targetRoute?.meta?.action && targetRoute?.meta?.subject)
     return ability.can(targetRoute.meta.action, targetRoute.meta.subject)
 
-  // If no specific permissions, fall back to checking if any parent route allows access
-    
+  // Si no tiene ningún permiso específico, verificar si alguna ruta padre permite acceso
   return to.matched.some(route => ability.can(route.meta.action, route.meta.subject))
 }

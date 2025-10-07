@@ -55,4 +55,12 @@ class RoleController extends Controller
         $role->save();
         return response()->json(['message' => 'Rol habilitado']);
     }
+
+    // Eliminar rol
+    public function destroy($id)
+    {
+        $role = Role::findOrFail($id);
+        $role->delete();
+        return response()->json(['message' => 'Rol eliminado']);
+    }
 }

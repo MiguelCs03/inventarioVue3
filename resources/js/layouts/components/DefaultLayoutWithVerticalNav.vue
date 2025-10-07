@@ -31,17 +31,26 @@ import { VerticalNavLayout } from '@layouts'
           />
         </IconBtn>
 
-        <NavSearchBar class="ms-lg-n3" />
+        <!-- Hidden: Search -->
+        <template v-if="false">
+          <NavSearchBar class="ms-lg-n3" />
+        </template>
 
         <VSpacer />
 
-        <NavBarI18n
-          v-if="themeConfig.app.i18n.enable && themeConfig.app.i18n.langConfig?.length"
-          :languages="themeConfig.app.i18n.langConfig"
-        />
+        <!-- Hidden: Language Switcher -->
+        <template v-if="false">
+          <NavBarI18n
+            v-if="themeConfig.app.i18n.enable && themeConfig.app.i18n.langConfig?.length"
+            :languages="themeConfig.app.i18n.langConfig"
+          />
+        </template>
         <NavbarThemeSwitcher />
-        <NavbarShortcuts />
-        <NavBarNotifications class="me-1" />
+        <!-- Hidden: Shortcuts & Notifications -->
+        <template v-if="false">
+          <NavbarShortcuts />
+          <NavBarNotifications class="me-1" />
+        </template>
         <UserProfile />
       </div>
     </template>

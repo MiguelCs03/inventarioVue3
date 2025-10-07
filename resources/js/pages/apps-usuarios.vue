@@ -57,6 +57,14 @@
         :search="search"
         class="elevation-1"
       >
+        <!-- Columna de roles (concatena nombres) -->
+        <template #item.roles="{ item }">
+          <span>
+            {{ Array.isArray(item.roles) && item.roles.length
+              ? item.roles.map(r => r?.nombre).filter(Boolean).join(', ')
+              : '—' }}
+          </span>
+        </template>
         <!-- Estado activo/inactivo -->
         <template #item.activo="{ item }">
           <VChip
@@ -255,7 +263,7 @@ const headers = [
   { title: 'Nombre', key: 'name', sortable: true },
   { title: 'Email', key: 'email', sortable: true },
   { title: 'Cargo', key: 'cargo', sortable: true },
-  { title: 'Rol', key: 'role.nombre', sortable: true },
+  { title: 'Rol', key: 'roles', sortable: false },
   { title: 'Estado', key: 'activo', sortable: true },
   { title: 'Acciones', key: 'actions', sortable: false, width: 150 }
 ]
@@ -270,9 +278,11 @@ const filteredUsers = computed(() => {
   let filtered = users.value
 
   if (selectedRole.value) {
-    filtered = filtered.filter(user => 
-      user.role?.nombre === selectedRole.value || user.cargo === selectedRole.value
-    )
+    filtered = filtered.filter(user => {
+      const userRoles = Array.isArray(user.roles) ? user.roles : []
+      const hasRole = userRoles.some(r => r?.nombre === selectedRole.value)
+      return hasRole || user.cargo === selectedRole.value
+    })
   }
 
   return filtered
@@ -309,7 +319,17 @@ const crearUsuario = () => {
 
 const guardarNuevoUsuario = async () => {
   try {
-    const response = await axios.post('/api/users', newUser.value)
+    // Convertir role_id (único) a arreglo 'roles' esperado por la API
+    const payload = {
+      name: newUser.value.name,
+      email: newUser.value.email,
+      password: newUser.value.password,
+      fecha_nacimiento: newUser.value.fecha_nacimiento,
+      cargo: newUser.value.cargo,
+      roles: newUser.value.role_id ? [newUser.value.role_id] : [],
+    }
+
+    const response = await axios.post('/api/users', payload)
     users.value.push(response.data)
     showCreateDialog.value = false
     resetForm()

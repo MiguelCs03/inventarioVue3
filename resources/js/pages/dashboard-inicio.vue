@@ -5,5 +5,14 @@
 </template>
 
 <script setup>
-// No logic needed for this simple page
+// Define metadata para la página
+definePage({
+  meta: {
+    // Especificar la sección para el control de acceso
+    section: 'dashboard-inicio',
+    // Especificar acción y sujeto para CASL
+    action: 'read',
+    subject: 'dashboard-inicio',
+  },
+})
 </script>

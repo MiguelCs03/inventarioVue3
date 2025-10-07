@@ -838,7 +838,7 @@ const eliminarPago = (index) => {
 }
 
 const actualizarTotalPagado = () => {
-  // Simplemente trigger reactivity para computed
+  // 
 }
 
 const confirmarOrden = async () => {

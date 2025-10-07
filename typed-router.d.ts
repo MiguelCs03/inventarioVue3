@@ -27,6 +27,7 @@ declare module 'vue-router/auto-routes' {
     'apps-roles': RouteRecordInfo<'apps-roles', '/apps/roles', Record<never, never>, Record<never, never>>,
     'apps-user-list': RouteRecordInfo<'apps-user-list', '/apps/user/list', Record<never, never>, Record<never, never>>,
     'apps-user-view-id': RouteRecordInfo<'apps-user-view-id', '/apps/user/view/:id', { id: ParamValue<true> }, { id: ParamValue<false> }>,
+    'apps-roles': RouteRecordInfo<'apps-roles', '/apps-roles', Record<never, never>, Record<never, never>>,
     'apps-usuarios': RouteRecordInfo<'apps-usuarios', '/apps-usuarios', Record<never, never>, Record<never, never>>,
     'apps-email-filter': RouteRecordInfo<'apps-email-filter', '/apps/email/:filter', { filter: ParamValue<true> }, { filter: ParamValue<false> }>,
     'apps-email-label': RouteRecordInfo<'apps-email-label', '/apps/email/:label', { label: ParamValue<true> }, { label: ParamValue<false> }>,
@@ -84,6 +85,7 @@ declare module 'vue-router/auto-routes' {
     'pages-pricing': RouteRecordInfo<'pages-pricing', '/pages/pricing', Record<never, never>, Record<never, never>>,
     'pages-typography': RouteRecordInfo<'pages-typography', '/pages/typography', Record<never, never>, Record<never, never>>,
     'pages-user-profile-tab': RouteRecordInfo<'pages-user-profile-tab', '/pages/user-profile/:tab', { tab: ParamValue<true> }, { tab: ParamValue<false> }>,
+    'perfil': RouteRecordInfo<'perfil', '/perfil', Record<never, never>, Record<never, never>>,
     'proveedores': RouteRecordInfo<'proveedores', '/proveedores', Record<never, never>, Record<never, never>>,
     'register': RouteRecordInfo<'register', '/register', Record<never, never>, Record<never, never>>,
   }

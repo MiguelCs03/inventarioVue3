@@ -1,13 +1,18 @@
 <script setup>
+import axios from 'axios'
 import { VForm } from 'vuetify/components/VForm'
+
+// Validation rules
+const requiredValidator = value => !!value || 'Este campo es requerido'
 
 const props = defineProps({
   rolePermissions: {
     type: Object,
     required: false,
     default: () => ({
-      name: '',
-      permissions: [],
+      id: null,
+      nombre: '',
+      activo: true,
     }),
   },
   isDialogVisible: {
@@ -19,140 +24,62 @@ const props = defineProps({
 const emit = defineEmits([
   'update:isDialogVisible',
   'update:rolePermissions',
+  'roleCreated',
+  'roleUpdated',
 ])
 
 
-// 👉 Permission List
-const permissions = ref([
-  {
-    name: 'User Management',
-    read: false,
-    write: false,
-    create: false,
-  },
-  {
-    name: 'Content Management',
-    read: false,
-    write: false,
-    create: false,
-  },
-  {
-    name: 'Disputes Management',
-    read: false,
-    write: false,
-    create: false,
-  },
-  {
-    name: 'Database Management',
-    read: false,
-    write: false,
-    create: false,
-  },
-  {
-    name: 'Financial Management',
-    read: false,
-    write: false,
-    create: false,
-  },
-  {
-    name: 'Reporting',
-    read: false,
-    write: false,
-    create: false,
-  },
-  {
-    name: 'API Control',
-    read: false,
-    write: false,
-    create: false,
-  },
-  {
-    name: 'Repository Management',
-    read: false,
-    write: false,
-    create: false,
-  },
-  {
-    name: 'Payroll',
-    read: false,
-    write: false,
-    create: false,
-  },
-])
+// 👉 Form fields
+const roleForm = ref({
+  id: null,
+  nombre: '',
+  activo: true,
+})
 
-const isSelectAll = ref(false)
-const role = ref('')
 const refPermissionForm = ref()
 
-const checkedCount = computed(() => {
-  let counter = 0
-  permissions.value.forEach(permission => {
-    Object.entries(permission).forEach(([key, value]) => {
-      if (key !== 'name' && value)
-        counter++
-    })
-  })
-  
-  return counter
-})
-
-const isIndeterminate = computed(() => checkedCount.value > 0 && checkedCount.value < permissions.value.length * 3)
-
-// select all
-watch(isSelectAll, val => {
-  permissions.value = permissions.value.map(permission => ({
-    ...permission,
-    read: val,
-    write: val,
-    create: val,
-  }))
-})
-
-// if Indeterminate is false, then set isSelectAll to false
-watch(isIndeterminate, () => {
-  if (!isIndeterminate.value)
-    isSelectAll.value = false
-})
-
-// if all permissions are checked, then set isSelectAll to true
-watch(permissions, () => {
-  if (checkedCount.value === permissions.value.length * 3)
-    isSelectAll.value = true
-}, { deep: true })
-
-// if rolePermissions is not empty, then set permissions
-watch(() => props, () => {
-  if (props.rolePermissions && props.rolePermissions.permissions.length) {
-    role.value = props.rolePermissions.name
-    permissions.value = permissions.value.map(permission => {
-      const rolePermission = props.rolePermissions?.permissions.find(item => item.name === permission.name)
-      if (rolePermission) {
-        return {
-          ...permission,
-          ...rolePermission,
-        }
-      }
-      
-      return permission
-    })
+// watch for rolePermissions changes
+watch(() => props.rolePermissions, (newVal) => {
+  if (newVal) {
+    roleForm.value = {
+      id: newVal.id || null,
+      nombre: newVal.nombre || '',
+      activo: newVal.activo !== undefined ? newVal.activo : true,
+    }
   }
-})
+}, { immediate: true, deep: true })
 
-const onSubmit = () => {
-  const rolePermissions = {
-    name: role.value,
-    permissions: permissions.value,
+const onSubmit = async () => {
+  try {
+    if (roleForm.value.id) {
+      // Editar rol existente
+      await axios.put(`/api/roles/${roleForm.value.id}`, {
+        nombre: roleForm.value.nombre,
+        activo: roleForm.value.activo,
+      })
+      emit('roleUpdated')
+    } else {
+      // Crear nuevo rol
+      await axios.post('/api/roles', {
+        nombre: roleForm.value.nombre,
+        activo: roleForm.value.activo,
+      })
+      emit('roleCreated')
+    }
+    
+    onReset()
+  } catch (error) {
+    console.error('Error al guardar rol:', error)
   }
-
-  emit('update:rolePermissions', rolePermissions)
-  emit('update:isDialogVisible', false)
-  isSelectAll.value = false
-  refPermissionForm.value?.reset()
 }
 
 const onReset = () => {
   emit('update:isDialogVisible', false)
-  isSelectAll.value = false
+  roleForm.value = {
+    id: null,
+    nombre: '',
+    activo: true,
+  }
   refPermissionForm.value?.reset()
 }
 </script>
@@ -170,89 +97,36 @@ const onReset = () => {
       <VCardText>
         <!-- 👉 Title -->
         <h4 class="text-h4 text-center mb-2">
-          {{ props.rolePermissions.name ? 'Edit' : 'Add New' }} Role
+          {{ roleForm.id ? 'Editar' : 'Crear' }} Rol
         </h4>
         <p class="text-body-1 text-center mb-6">
-          Set Role Permissions
+          {{ roleForm.id ? 'Modifica los datos del rol' : 'Ingresa los datos del nuevo rol' }}
         </p>
 
         <!-- 👉 Form -->
-        <VForm ref="refPermissionForm">
+        <VForm ref="refPermissionForm" @submit.prevent="onSubmit">
           <!-- 👉 Role name -->
           <AppTextField
-            v-model="role"
-            label="Role Name"
-            placeholder="Enter Role Name"
+            v-model="roleForm.nombre"
+            label="Nombre del Rol"
+            placeholder="Ej: Administrador, Empleado, etc."
+            :rules="[requiredValidator]"
+            class="mb-4"
           />
 
-          <h5 class="text-h5 my-6">
-            Role Permissions
-          </h5>
-
-          <!-- 👉 Role Permissions -->
-
-          <VTable class="permission-table text-no-wrap mb-6">
-            <!-- 👉 Admin  -->
-            <tr>
-              <td>
-                <h6 class="text-h6">
-                  Administrator Access
-                </h6>
-              </td>
-              <td colspan="3">
-                <div class="d-flex justify-end">
-                  <VCheckbox
-                    v-model="isSelectAll"
-                    v-model:indeterminate="isIndeterminate"
-                    label="Select All"
-                  />
-                </div>
-              </td>
-            </tr>
-
-            <!-- 👉 Other permission loop -->
-            <template
-              v-for="permission in permissions"
-              :key="permission.name"
-            >
-              <tr>
-                <td>
-                  <h6 class="text-h6">
-                    {{ permission.name }}
-                  </h6>
-                </td>
-                <td>
-                  <div class="d-flex justify-end">
-                    <VCheckbox
-                      v-model="permission.read"
-                      label="Read"
-                    />
-                  </div>
-                </td>
-                <td>
-                  <div class="d-flex justify-end">
-                    <VCheckbox
-                      v-model="permission.write"
-                      label="Write"
-                    />
-                  </div>
-                </td>
-                <td>
-                  <div class="d-flex justify-end">
-                    <VCheckbox
-                      v-model="permission.create"
-                      label="Create"
-                    />
-                  </div>
-                </td>
-              </tr>
-            </template>
-          </VTable>
+          <!-- 👉 Role status -->
+          <div class="mb-6">
+            <VCheckbox
+              v-model="roleForm.activo"
+              label="Rol activo"
+              class="mb-0"
+            />
+          </div>
 
           <!-- 👉 Actions button -->
           <div class="d-flex align-center justify-center gap-4">
-            <VBtn @click="onSubmit">
-              Submit
+            <VBtn type="submit" :loading="false">
+              {{ roleForm.id ? 'Actualizar' : 'Crear' }}
             </VBtn>
 
             <VBtn
@@ -260,7 +134,7 @@ const onReset = () => {
               variant="tonal"
               @click="onReset"
             >
-              Cancel
+              Cancelar
             </VBtn>
           </div>
         </VForm>
@@ -270,22 +144,5 @@ const onReset = () => {
 </template>
 
 <style lang="scss">
-.permission-table {
-  td {
-    border-block-end: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
-    padding-block: 0.5rem;
-
-    .v-checkbox {
-      min-inline-size: 4.75rem;
-    }
-
-    &:not(:first-child) {
-      padding-inline: 0.5rem;
-    }
-
-    .v-label {
-      white-space: nowrap;
-    }
-  }
-}
+// Estilos personalizados si son necesarios
 </style>

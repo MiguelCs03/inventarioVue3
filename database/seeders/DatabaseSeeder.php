@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
 
         $this->call(MenuSeeder::class);
         $this->call(RoleSeeder::class);
+        $this->call(PermissionSeeder::class);
         $this->call(ClienteSeeder::class);
         $this->call(ProductoSeeder::class);
         $this->call(MetodoPagoSeeder::class);

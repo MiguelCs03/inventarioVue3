@@ -16,7 +16,7 @@ import { VNodeRenderer } from '@layouts/components/VNodeRenderer'
 
 <template>
   <HorizontalNavLayout :nav-items="navItems">
-    <!-- 👉 navbar -->
+    <!--  navbar -->
     <template #navbar>
       <RouterLink
         to="/"
@@ -30,28 +30,37 @@ import { VNodeRenderer } from '@layouts/components/VNodeRenderer'
       </RouterLink>
       <VSpacer />
 
-      <NavSearchBar trigger-btn-class="ms-lg-n3" />
+      <!-- Hidden: Search -->
+      <template v-if="false">
+        <NavSearchBar trigger-btn-class="ms-lg-n3" />
+      </template>
 
-      <NavBarI18n
-        v-if="themeConfig.app.i18n.enable && themeConfig.app.i18n.langConfig?.length"
-        :languages="themeConfig.app.i18n.langConfig"
-      />
+      <!-- Hidden: Language Switcher -->
+      <template v-if="false">
+        <NavBarI18n
+          v-if="themeConfig.app.i18n.enable && themeConfig.app.i18n.langConfig?.length"
+          :languages="themeConfig.app.i18n.langConfig"
+        />
+      </template>
 
       <NavbarThemeSwitcher />
-      <NavbarShortcuts />
-      <NavBarNotifications class="me-2" />
+      <!-- Hidden: Shortcuts & Notifications -->
+      <template v-if="false">
+        <NavbarShortcuts />
+        <NavBarNotifications class="me-2" />
+      </template>
       <UserProfile />
     </template>
 
-    <!-- 👉 Pages -->
+    <!--  Pages -->
     <slot />
 
-    <!-- 👉 Footer -->
+    <!--  Footer -->
     <template #footer>
       <Footer />
     </template>
 
-    <!-- 👉 Customizer -->
+    <!--  Customizer -->
     <TheCustomizer />
   </HorizontalNavLayout>
 </template>

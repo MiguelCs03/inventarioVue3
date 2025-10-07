@@ -51,7 +51,8 @@ watch(() => props.user, (user) => {
       password: '',
       cargo: user.cargo,
       fecha_nacimiento: user.fecha_nacimiento,
-      role_id: user.role_id || (user.role ? user.role.id : null),
+      // Mapear desde colección de roles si existe
+      role_id: user.role_id || (Array.isArray(user.roles) && user.roles.length ? user.roles[0].id : (user.role ? user.role.id : null)),
       activo: user.activo !== false,
     }
   }
@@ -65,7 +66,17 @@ onMounted(async () => {
 const onSubmit = async () => {
   if (!formRef.value.validate()) return
   try {
-    await axios.put(`/api/users/${props.user.id}`, form.value)
+    // Convertir role_id a arreglo roles solicitado por API
+    const payload = {
+      name: form.value.name,
+      email: form.value.email,
+      password: form.value.password || undefined,
+      cargo: form.value.cargo,
+      fecha_nacimiento: form.value.fecha_nacimiento,
+      activo: form.value.activo,
+      roles: form.value.role_id ? [form.value.role_id] : [],
+    }
+    await axios.put(`/api/users/${props.user.id}`, payload)
     emit('updated')
     close()
   } catch (e) {
