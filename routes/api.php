@@ -1,3 +1,5 @@
+
+
 <?php
 
 use App\Http\Controllers\AuthController;
@@ -12,6 +14,38 @@ use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Http\Request;
+// ruta para reestablecimiento/cambio de contraseña 
+// Rutas para recuperación de contraseña (Password Reset)
+Route::post('/forgot-password', function (Request $request) {
+    $request->validate(['email' => 'required|email']);
+    $status = Password::sendResetLink(
+        $request->only('email')
+    );
+    return $status === Password::RESET_LINK_SENT
+        ? response()->json(['message' => __($status)])
+        : response()->json(['message' => __($status)], 422);
+});
+
+Route::post('/reset-password', function (Request $request) {
+    $request->validate([
+        'token' => 'required',
+        'email' => 'required|email',
+        'password' => 'required|min:6|confirmed',
+    ]);
+    $status = Password::reset(
+        $request->only('email', 'password', 'password_confirmation', 'token'),
+        function ($user, $password) {
+            $user->forceFill([
+                'password' => bcrypt($password)
+            ])->save();
+        }
+    );
+    return $status === Password::PASSWORD_RESET
+        ? response()->json(['message' => __($status)])
+        : response()->json(['message' => __($status)], 422);
+});
 
 // Ruta de prueba para logs
 Route::get('/test-log', function () {

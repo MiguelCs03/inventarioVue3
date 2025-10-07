@@ -132,11 +132,9 @@ const onSubmit = () => {
       >
         <VCardText>
           <h4 class="text-h4 mb-1">
-            Welcome to <span class="text-capitalize"> {{ themeConfig.app.title }} </span>! 👋🏻
+            Bienvenido a  <span class="text-capitalize"> {{ themeConfig.app.title }} </span>! 👋🏻
           </h4>
-          <p class="mb-0">
-            Please sign-in to your account and start the adventure
-          </p>
+        
         </VCardText>
         <VCardText>
           <VAlert
@@ -187,13 +185,13 @@ const onSubmit = () => {
                 <div class="d-flex align-center flex-wrap justify-space-between my-6">
                   <VCheckbox
                     v-model="rememberMe"
-                    label="Remember me"
+                    label="Recuerdame"
                   />
                   <RouterLink
                     class="text-primary ms-2 mb-1"
                     :to="{ name: 'forgot-password' }"
                   >
-                    Forgot Password?
+                    ¿Olvidaste tu contraseña?
                   </RouterLink>
                 </div>
 

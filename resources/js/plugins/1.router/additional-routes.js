@@ -109,9 +109,36 @@ export const routes = [
     name: 'perfil',
     component: () => import('@/pages/perfil.vue'),
     meta: {
-      // No requiere sección específica - todos los usuarios pueden acceder a su perfil
+      section: 'perfil', 
       action: 'read',
       subject: 'perfil',
     },
   },
+  // Ruta para clientes
+  {
+    path: '/clientes',
+    name: 'clientes',
+    component: () => import('@/pages/clientes.vue'),
+    meta: {
+      section: 'clientes',
+      action: 'read',
+      subject: 'clientes',
+      navActiveLink: 'clientes',
+      layoutWrapperClasses: 'layout-content-height-fixed',
+    },
+  },
+  // Ruta para ordenes
+  {
+    path: '/ordenes',
+    name: 'ordenes',
+    component: () => import('@/pages/ordenes.vue'),
+    meta: {
+      section: 'ordenes',
+      action: 'read',
+      subject: 'ordenes',
+      navActiveLink: 'ordenes',
+      layoutWrapperClasses: 'layout-content-height-fixed',
+    },
+  },
+  
 ]

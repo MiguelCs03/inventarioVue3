@@ -69,7 +69,7 @@ class AuthController extends Controller
                 // Generar reglas de habilidad para CASL
                 $userAbilityRules = [];
                 // Asegurar dashboard-inicio siempre accesible para usuarios autenticados
-                $allowedSections[] = 'dashboard-inicio';
+                $allowedSections[] = 'perfil';
                 $normalizedSections = array_values(array_unique(array_map(function ($s) {
                     return trim(strtolower($s));
                 }, $allowedSections)));
@@ -80,6 +80,7 @@ class AuthController extends Controller
                     ];
                 }
             }
+              
 
             // Log debug
             \Log::info('Login payload', [

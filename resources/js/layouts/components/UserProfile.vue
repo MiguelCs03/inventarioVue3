@@ -8,23 +8,16 @@ const ability = useAbility()
 const userData = useCookie('userData')
 
 const logout = async () => {
+  // Eliminar cookies con path explícito para asegurar borrado correcto
+  useCookie('accessToken', { path: '/' }).value = null
+  useCookie('userData', { path: '/' }).value = null
+  useCookie('userAbilityRules', { path: '/' }).value = null
 
-  // Remove "accessToken" from cookie
-  useCookie('accessToken').value = null
-
-  // Remove "userData" from cookie
-  userData.value = null
-
-  // Redirect to login page
-  await router.push('/login')
-
-  // ℹ️ We had to remove abilities in then block because if we don't nav menu items mutation is visible while redirecting user to login page
-
-  // Remove "userAbilities" from cookie
-  useCookie('userAbilityRules').value = null
-
-  // Reset ability to initial ability
+  // Reset ability a vacío
   ability.update([])
+
+  // Redirigir a login
+  await router.push('/login')
 }
 
 const userProfileList = [
