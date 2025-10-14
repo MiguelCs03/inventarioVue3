@@ -67,7 +67,7 @@ async function onSubmit() {
     if (res.ok) {
       successMsg.value = 'Contraseña restablecida correctamente. Ahora puedes iniciar sesión.'
       // Opcional: redirigir al login después de unos segundos
-      setTimeout(() => router.push({ name: 'pages-authentication-login-v1' }), 2000)
+      setTimeout(() => router.push({ name: 'login' }), 2000)
     } else {
       errorMsg.value = data.message || 'Error al restablecer la contraseña.'
     }

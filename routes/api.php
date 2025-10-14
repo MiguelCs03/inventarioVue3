@@ -20,12 +20,11 @@ use Illuminate\Http\Request;
 // Rutas para recuperación de contraseña (Password Reset)
 Route::post('/forgot-password', function (Request $request) {
     $request->validate(['email' => 'required|email']);
-    $status = Password::sendResetLink(
-        $request->only('email')
-    );
-    return $status === Password::RESET_LINK_SENT
-        ? response()->json(['message' => __($status)])
-        : response()->json(['message' => __($status)], 422);
+     // Ejecuta el envío, pero siempre responde igual para evitar enumeración de usuarios
+    Password::sendResetLink($request->only('email'));
+    return response()->json([
+        'message' => 'se ha enviado un enlace para restablecer la contraseña.'
+    ]);
 });
 
 Route::post('/reset-password', function (Request $request) {

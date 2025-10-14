@@ -19,7 +19,7 @@ class AuthController extends Controller
         if (Auth::attempt($validated)) {
             $user = Auth::user();
 
-            // Crear un token simple (puedes usar Sanctum para algo más robusto)
+            // Crear un token simple 
             $token = bin2hex(random_bytes(32));
 
             // Obtener permisos por roles y calcular secciones permitidas

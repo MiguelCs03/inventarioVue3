@@ -9,10 +9,22 @@ import authV2MaskDark from '@images/pages/misc-mask-dark.png'
 import authV2MaskLight from '@images/pages/misc-mask-light.png'
 import axios from 'axios'
 
+
 const email = ref('')
 const loading = ref(false)
 const success = ref(false)
 const errorMsg = ref('')
+
+// Toast popup
+const toastMsg = ref('')
+const showToast = ref(false)
+function showPopup(msg) {
+  toastMsg.value = msg
+  showToast.value = true
+  setTimeout(() => {
+    showToast.value = false
+  }, 2000)
+}
 
 const authThemeImg = useGenerateImageVariant(authV2ForgotPasswordIllustrationLight, authV2ForgotPasswordIllustrationDark)
 const authThemeMask = useGenerateImageVariant(authV2MaskLight, authV2MaskDark)
@@ -25,8 +37,10 @@ const onSubmit = async () => {
   try {
     await axios.post('/api/forgot-password', { email: email.value })
     success.value = true
+    showPopup('se ha enviado un enlace para restablecer la contraseña.')
   } catch (err) {
     errorMsg.value = err.response?.data?.message || 'Error sending reset link.'
+    showPopup(errorMsg.value)
   } finally {
     loading.value = false
   }
@@ -109,19 +123,10 @@ definePage({
                 </VBtn>
               </VCol>
 
-              <!-- Mensaje de éxito -->
-              <VCol cols="12" v-if="success">
-                <div class="text-success text-center">
-                  Si el correo existe, se ha enviado un enlace para restablecer la contraseña.
-                </div>
-              </VCol>
-
-              <!-- Mensaje de error -->
-              <VCol cols="12" v-if="errorMsg">
-                <div class="text-error text-center">
-                  {{ errorMsg }}
-                </div>
-              </VCol>
+              <!-- Toast popup -->
+              <div v-if="showToast" class="toast-popup">
+                {{ toastMsg }}
+              </div>
 
               <!-- back to login -->
               <VCol cols="12">
@@ -147,4 +152,20 @@ definePage({
 
 <style lang="scss">
 @use "@core-scss/template/pages/page-auth.scss";
+
+.toast-popup {
+  position: fixed;
+  top: 30px;
+  right: 30px;
+  background: #1976d2;
+  color: #fff;
+  padding: 16px 32px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px #0003;
+  z-index: 9999;
+  font-size: 16px;
+  animation: fadein 0.3s, fadeout 0.3s 1.7s;
+}
+@keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fadeout { from { opacity: 1; } to { opacity: 0; } }
 </style>
