@@ -44,12 +44,7 @@
               />
             </VCol>
             <VCol cols="12" md="3">
-              <VSelect
-                v-model="itemsPerPage"
-                label="Items por página"
-                :items="[10, 25, 50]"
-                @update:model-value="buscarOrdenes"
-              />
+                
             </VCol>
           </VRow>
         </VCardText>
@@ -127,22 +122,6 @@
                 color="success"
                 variant="text"
                 @click="abrirModalConfirmar(item)"
-              />
-            </div>
-          </template>
-
-          <!-- Pie de tabla -->
-          <template #bottom>
-            <VDivider />
-            <div class="d-flex align-center justify-space-between pa-4">
-              <div class="text-body-2">
-                Mostrando {{ ordenes.length }} de {{ totalOrdenes }} órdenes
-              </div>
-              <VPagination
-                v-model="page"
-                :length="Math.ceil(totalOrdenes / itemsPerPage)"
-                :total-visible="5"
-                @update:model-value="buscarOrdenes"
               />
             </div>
           </template>

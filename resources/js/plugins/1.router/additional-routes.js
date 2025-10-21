@@ -140,5 +140,54 @@ export const routes = [
       layoutWrapperClasses: 'layout-content-height-fixed',
     },
   },
+  // Rutas para gestión de grupos, marcas, subgrupos y unidades
+  {
+    path: '/apps/grupos',
+    name: 'apps-grupos',
+    component: () => import('@/pages/apps/grupo/GrupoPage.vue'),
+    meta: {
+      section: 'grupos',
+      action: 'read',
+      subject: 'grupos',
+      navActiveLink: 'grupos',
+      layoutWrapperClasses: 'layout-content-height-fixed',
+    },
+  },
+  {
+    path: '/apps/marcas',
+    name: 'apps-marcas',
+    component: () => import('@/pages/apps/marca/MarcaPage.vue'),
+    meta: {
+      section: 'marcas',
+      action: 'read',
+      subject: 'marcas',
+      navActiveLink: 'marcas',
+      layoutWrapperClasses: 'layout-content-height-fixed',
+    },
+  },
+  {
+    path: '/apps/subgrupos',
+    name: 'apps-subgrupos',
+    component: () => import('@/pages/apps/subgrupo/SubGrupoPage.vue'),
+    meta: {
+      section: 'subgrupos',
+      action: 'read',
+      subject: 'subgrupos',
+      navActiveLink: 'subgrupos',
+      layoutWrapperClasses: 'layout-content-height-fixed',
+    },
+  },
+  {
+    path: '/apps/unidades',
+    name: 'apps-unidades',
+    component: () => import('@/pages/apps/unidad/UnidadPage.vue'),
+    meta: {
+      section: 'unidades',
+      action: 'read',
+      subject: 'unidades',
+      navActiveLink: 'unidades',
+      layoutWrapperClasses: 'layout-content-height-fixed',
+    },
+  },
   
 ]

@@ -1,11 +1,11 @@
 <template>
   <div>
     <!-- Header con título y botón de nuevo usuario -->
-    <VCard class="mb-6">
-      <VCardText>
+    <VCard class="mb-2 no-padding-card">
+      <VCardText class="py-2 px-4">
         <div class="d-flex justify-space-between align-center">
           <div>
-            <h2 class="text-h4 mb-2">Gestión de Usuarios</h2>
+            <h2 class="text-h4 mb-1">Gestión de Usuarios</h2>
             <p class="text-body-1 mb-0">Administra los usuarios del sistema</p>
           </div>
           <VBtn 
@@ -20,8 +20,8 @@
     </VCard>
 
     <!-- Filtros y búsqueda -->
-    <VCard class="mb-6">
-      <VCardText>
+    <VCard class="mb-2 no-padding-card">
+      <VCardText class="py-2 px-4">
         <VRow>
           <VCol cols="12" md="8">
             <VTextField
@@ -392,5 +392,14 @@ onMounted(() => {
 <style scoped>
 .elevation-1 {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+ </style>
+<style scoped>
+.no-padding-card .v-card-text {
+  padding-top: 8px !important;
+  padding-bottom: 8px !important;
+}
+.no-padding-card {
+  margin-bottom: 8px !important;
 }
 </style>

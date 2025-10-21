@@ -1,0 +1,8 @@
+{
+  "$vuetify": {
+    "dataFooter": {
+      "itemsPerPageText": "Página:",
+      "itemsPerPageAll": "Todos"
+    }
+  }
+}

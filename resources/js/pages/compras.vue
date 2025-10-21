@@ -44,12 +44,7 @@
               />
             </VCol>
             <VCol cols="12" md="3">
-              <VSelect
-                v-model="itemsPerPage"
-                label="Items por página"
-                :items="[10, 25, 50, 100]"
-                @update:model-value="buscarCompras"
-              />
+              
             </VCol>
           </VRow>
         </VCardText>
@@ -111,22 +106,6 @@
                 color="info"
                 variant="text"
                 @click="verCompra(item)"
-              />
-            </div>
-          </template>
-
-          <!-- Pie de tabla -->
-          <template #bottom>
-            <VDivider />
-            <div class="d-flex align-center justify-space-between pa-4">
-              <div class="text-body-2">
-                Mostrando {{ compras.length }} de {{ totalCompras }} compras
-              </div>
-              <VPagination
-                v-model="page"
-                :length="Math.ceil(totalCompras / itemsPerPage)"
-                :total-visible="5"
-                @update:model-value="buscarCompras"
               />
             </div>
           </template>

@@ -11,6 +11,10 @@ use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\GrupoController;
+use App\Http\Controllers\MarcaController;
+use App\Http\Controllers\SubGrupoController;
+use App\Http\Controllers\UnidadController;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
@@ -165,3 +169,9 @@ Route::put('/proveedores/{proveedor}/deactivate', [App\Http\Controllers\Proveedo
 
 // Rutas para compras
 Route::apiResource('compras', App\Http\Controllers\CompraController::class);
+
+// Rutas para nuevos controladores: grupos, marcas, subgrupos, unidades
+Route::apiResource('grupos', GrupoController::class);
+Route::apiResource('marcas', MarcaController::class);
+Route::apiResource('subgrupos', SubGrupoController::class);
+Route::apiResource('unidades', UnidadController::class);
