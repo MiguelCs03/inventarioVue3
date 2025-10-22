@@ -5,13 +5,25 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
     // Listar usuarios
     public function index()
     {
-        return response()->json(User::with('roles')->get());
+        $users = User::with('roles')->get();
+        
+        // Transformar para incluir avatar_url
+        $users = $users->map(function ($user) {
+            $userData = $user->toArray();
+            if (!empty($user->avatar)) {
+                $userData['avatar_url'] = asset('storage/' . $user->avatar);
+            }
+            return $userData;
+        });
+        
+        return response()->json($users);
     }
 
     // Crear usuario
@@ -19,17 +31,25 @@ class UserController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'username' => 'nullable|string|max:255|unique:users,username',
             'email' => 'required|email|unique:users,email',
+            'numero' => 'nullable|string|max:20',
             'password' => 'required|string|min:6',
             'fecha_nacimiento' => 'nullable|date',
             'cargo' => 'nullable|string|max:255',
             'roles' => 'nullable|array',
             'roles.*' => 'exists:roles,id',
+            'avatar' => 'nullable|image|max:2048',
         ]);
 
         $validated['password'] = Hash::make($validated['password']);
         $roles = $validated['roles'] ?? [];
         unset($validated['roles']);
+
+        // Manejar subida de avatar opcional
+        if ($request->hasFile('avatar')) {
+            $validated['avatar'] = $request->file('avatar')->store('avatars', 'public');
+        }
 
         $user = User::create($validated);
 
@@ -38,7 +58,13 @@ class UserController extends Controller
             $user->roles()->attach($roles);
         }
 
-        return response()->json($user->load('roles'), 201);
+        // Responder incluyendo URL pública del avatar si existe
+        $user->load('roles');
+        $response = $user->toArray();
+        if (!empty($user->avatar)) {
+            $response['avatar_url'] = asset('storage/' . $user->avatar);
+        }
+        return response()->json($response, 201);
     }
 
     // Editar usuario
@@ -47,7 +73,9 @@ class UserController extends Controller
         $user = User::findOrFail($id);
         $validated = $request->validate([
             'name' => 'sometimes|string|max:255',
+            'username' => 'sometimes|string|max:255|unique:users,username,'.$id,
             'email' => 'sometimes|email|unique:users,email,'.$id,
+            'numero' => 'nullable|string|max:20',
             'password' => 'nullable|string|min:6',
             'fecha_nacimiento' => 'nullable|date',
             'cargo' => 'nullable|string|max:255',
@@ -145,5 +173,43 @@ class UserController extends Controller
         ]);
 
         return response()->json(['message' => 'Contraseña actualizada exitosamente']);
+    }
+    // subir imagen al perfil 
+    public function uploadAvatar(Request $request)
+    {
+        // Debug: registrar información de la sesión y autenticación
+        \Log::info('Upload avatar attempt', [
+            'session_id' => $request->session()->getId(),
+            'has_session' => $request->hasSession(),
+            'auth_check' => Auth::check(),
+            'auth_id' => Auth::id(),
+        ]);
+
+        $user = Auth::user(); 
+        
+        if (!$user) {
+            // Si por alguna razón el usuario no está autenticado, devuelve un error 401
+            \Log::warning('Avatar upload failed: user not authenticated');
+            return response()->json(['message' => 'No autorizado. Por favor, inicie sesión.'], 401);
+        }
+
+        $validated = $request->validate([
+            'avatar' => 'required|image|max:2048', 
+        ]);
+
+        $path = $request->file('avatar')->store('avatars', 'public');
+
+        // Eliminar imagen anterior si existe
+        if ($user->avatar && \Storage::disk('public')->exists($user->avatar)) {
+            \Storage::disk('public')->delete($user->avatar);
+        }
+        
+        $user->avatar = $path;
+        $user->save();
+
+        return response()->json([
+            'message' => 'Avatar subido exitosamente',
+            'avatar_url' => asset('storage/' . $path),
+        ]);
     }
 }

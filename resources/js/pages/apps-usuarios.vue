@@ -88,9 +88,9 @@
               @click="editarUsuario(item)"
             />
             
-            <!-- Activar/Desactivar -->
+            <!-- Activar/Desactivar (Candado) -->
             <VBtn
-              :icon="item.activo ? 'tabler-user-off' : 'tabler-user-check'"
+              :icon="item.activo ? 'tabler-lock' : 'tabler-lock-open'"
               size="small"
               :color="item.activo ? 'warning' : 'success'"
               variant="text"
@@ -133,6 +133,14 @@
         <VCardText>
           <VContainer>
             <VRow>
+             <!-- añadir imagen de perfil -->
+                <VCol cols="12" class="d-flex flex-column align-center">
+                  <VAvatar size="96" class="mb-2">
+                    <VImg v-if="newUserPreview" :src="newUserPreview" />
+                    <VIcon v-else icon="tabler-user" size="48" />
+                  </VAvatar>
+                  <input type="file" accept="image/*" @change="onNewUserAvatarChange" />
+                </VCol>
               <VCol cols="12" md="6">
                 <VTextField
                   v-model="newUser.name"
@@ -144,11 +152,29 @@
               
               <VCol cols="12" md="6">
                 <VTextField
+                  v-model="newUser.username"
+                  label="Nombre de usuario"
+                  placeholder="usuario123"
+                  prepend-inner-icon="mdi-at"
+                />
+              </VCol>
+              
+              <VCol cols="12" md="6">
+                <VTextField
                   v-model="newUser.email"
                   label="Email"
                   type="email"
                   required
                   prepend-inner-icon="mdi-email"
+                />
+              </VCol>
+              
+              <VCol cols="12" md="6">
+                <VTextField
+                  v-model="newUser.numero"
+                  label="Número de celular"
+                  placeholder="+591 70123456"
+                  prepend-inner-icon="mdi-phone"
                 />
               </VCol>
               
@@ -220,6 +246,138 @@
       @close="isEditModalOpen = false"
       @updated="actualizarUsuario"
     />
+
+    <!-- Modal Ver Detalles -->
+    <VDialog 
+      v-model="modalVerVisible" 
+      max-width="600px"
+    >
+      <VCard v-if="usuarioDetalle">
+        <VCardTitle class="d-flex justify-space-between align-center">
+          <span class="text-h5">Detalles del Usuario</span>
+          <VBtn
+            icon="tabler-x"
+            variant="text"
+            @click="modalVerVisible = false"
+          />
+        </VCardTitle>
+        
+        <VCardText>
+          <VRow>
+            <VCol cols="12" class="text-center pb-6">
+              <VAvatar
+                size="96"
+                :color="!usuarioDetalle.avatar_url ? 'primary' : undefined"
+                :variant="!usuarioDetalle.avatar_url ? 'tonal' : undefined"
+              >
+                <VImg v-if="usuarioDetalle.avatar_url" :src="usuarioDetalle.avatar_url" />
+                <span v-else class="text-h4">{{ obtenerIniciales(usuarioDetalle) }}</span>
+              </VAvatar>
+              <h3 class="mt-4">
+                {{ usuarioDetalle.name }}
+              </h3>
+              <VChip
+                :color="usuarioDetalle.activo ? 'success' : 'error'"
+                size="small"
+                variant="tonal"
+                class="mt-2"
+              >
+                {{ usuarioDetalle.activo ? 'ACTIVO' : 'INACTIVO' }}
+              </VChip>
+            </VCol>
+            
+            <VCol cols="6">
+              <div class="text-body-2 text-medium-emphasis mb-1">
+                <VIcon icon="tabler-mail" size="16" class="me-1" />
+                Email
+              </div>
+              <div class="text-body-1">{{ usuarioDetalle.email }}</div>
+            </VCol>
+            
+            <VCol cols="6">
+              <div class="text-body-2 text-medium-emphasis mb-1">
+                <VIcon icon="tabler-at" size="16" class="me-1" />
+                Username
+              </div>
+              <div class="text-body-1">{{ usuarioDetalle.username || 'No especificado' }}</div>
+            </VCol>
+            
+            <VCol cols="6">
+              <div class="text-body-2 text-medium-emphasis mb-1">
+                <VIcon icon="tabler-phone" size="16" class="me-1" />
+                Número de celular
+              </div>
+              <div class="text-body-1">{{ usuarioDetalle.numero || 'No especificado' }}</div>
+            </VCol>
+            
+            <VCol cols="6">
+              <div class="text-body-2 text-medium-emphasis mb-1">
+                <VIcon icon="tabler-briefcase" size="16" class="me-1" />
+                Cargo
+              </div>
+              <div class="text-body-1">{{ usuarioDetalle.cargo || 'No especificado' }}</div>
+            </VCol>
+            
+            <VCol cols="12">
+              <div class="text-body-2 text-medium-emphasis mb-1">
+                <VIcon icon="tabler-shield" size="16" class="me-1" />
+                Roles
+              </div>
+              <div class="text-body-1">
+                <VChip
+                  v-for="role in usuarioDetalle.roles"
+                  :key="role.id"
+                  size="small"
+                  color="primary"
+                  variant="tonal"
+                  class="me-1"
+                >
+                  {{ role.nombre }}
+                </VChip>
+                <span v-if="!usuarioDetalle.roles || usuarioDetalle.roles.length === 0">
+                  Sin roles asignados
+                </span>
+              </div>
+            </VCol>
+            
+            <VCol cols="6">
+              <div class="text-body-2 text-medium-emphasis mb-1">
+                <VIcon icon="tabler-calendar" size="16" class="me-1" />
+                Fecha de nacimiento
+              </div>
+              <div class="text-body-1">{{ usuarioDetalle.fecha_nacimiento || 'No especificada' }}</div>
+            </VCol>
+            
+            <VCol cols="6">
+              <div class="text-body-2 text-medium-emphasis mb-1">
+                <VIcon icon="tabler-clock" size="16" class="me-1" />
+                Fecha de registro
+              </div>
+              <div class="text-body-1">{{ formatearFecha(usuarioDetalle.created_at) }}</div>
+            </VCol>
+            
+            <VCol cols="12">
+              <div class="text-body-2 text-medium-emphasis mb-1">
+                <VIcon icon="tabler-refresh" size="16" class="me-1" />
+                Última actualización
+              </div>
+              <div class="text-body-1">{{ formatearFecha(usuarioDetalle.updated_at) }}</div>
+            </VCol>
+          </VRow>
+        </VCardText>
+
+        <VCardActions>
+          <VSpacer />
+          <VBtn
+            color="primary"
+            variant="elevated"
+            @click="modalVerVisible = false"
+          >
+            Cerrar
+          </VBtn>
+        </VCardActions>
+      </VCard>
+    </VDialog>
   </div>
 </template>
 
@@ -239,16 +397,22 @@ const roles = ref([])
 const showCreateDialog = ref(false)
 const isEditModalOpen = ref(false)
 const usuarioEditando = ref(null)
+const modalVerVisible = ref(false)
+const usuarioDetalle = ref(null)
 
 // Formulario de nuevo usuario
 const newUser = ref({
   name: '',
+  username: '',
   email: '',
+  numero: '',
   password: '',
   fecha_nacimiento: '',
   cargo: '',
-  role_id: null
+  role_id: null,
+  avatarFile: null,
 })
+const newUserPreview = ref('')
 
 // Opciones para el select de roles
 const roleOptions = ref([
@@ -319,17 +483,27 @@ const crearUsuario = () => {
 
 const guardarNuevoUsuario = async () => {
   try {
-    // Convertir role_id (único) a arreglo 'roles' esperado por la API
-    const payload = {
-      name: newUser.value.name,
-      email: newUser.value.email,
-      password: newUser.value.password,
-      fecha_nacimiento: newUser.value.fecha_nacimiento,
-      cargo: newUser.value.cargo,
-      roles: newUser.value.role_id ? [newUser.value.role_id] : [],
-    }
+    // Enviar como multipart/form-data para incluir imagen
+    const form = new FormData()
+    form.append('name', newUser.value.name)
+    if (newUser.value.username)
+      form.append('username', newUser.value.username)
+    form.append('email', newUser.value.email)
+    if (newUser.value.numero)
+      form.append('numero', newUser.value.numero)
+    form.append('password', newUser.value.password)
+    if (newUser.value.fecha_nacimiento)
+      form.append('fecha_nacimiento', newUser.value.fecha_nacimiento)
+    if (newUser.value.cargo)
+      form.append('cargo', newUser.value.cargo)
+    const roles = newUser.value.role_id ? [newUser.value.role_id] : []
+    roles.forEach(r => form.append('roles[]', r))
+    if (newUser.value.avatarFile)
+      form.append('avatar', newUser.value.avatarFile)
 
-    const response = await axios.post('/api/users', payload)
+    const response = await axios.post('/api/users', form, {
+      headers: { 'Accept': 'application/json' },
+    })
     users.value.push(response.data)
     showCreateDialog.value = false
     resetForm()
@@ -344,12 +518,16 @@ const guardarNuevoUsuario = async () => {
 const resetForm = () => {
   newUser.value = {
     name: '',
+    username: '',
     email: '',
+    numero: '',
     password: '',
     fecha_nacimiento: '',
     cargo: '',
-    role_id: null
+    role_id: null,
+    avatarFile: null,
   }
+  newUserPreview.value = ''
 }
 
 const editarUsuario = (usuario) => {
@@ -362,8 +540,27 @@ const actualizarUsuario = async () => {
 }
 
 const verUsuario = (usuario) => {
-  console.log('Ver usuario:', usuario)
-  // Aquí mostrar detalles del usuario
+  usuarioDetalle.value = usuario
+  modalVerVisible.value = true
+}
+
+const obtenerIniciales = (usuario) => {
+  if (!usuario || !usuario.name) return '?'
+  const nombres = usuario.name.trim().split(' ')
+  if (nombres.length === 1) return nombres[0].charAt(0).toUpperCase()
+  return (nombres[0].charAt(0) + nombres[nombres.length - 1].charAt(0)).toUpperCase()
+}
+
+const formatearFecha = (fecha) => {
+  if (!fecha) return 'No disponible'
+  const date = new Date(fecha)
+  return date.toLocaleDateString('es-ES', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
 }
 
 const toggleEstadoUsuario = async (usuario) => {
@@ -387,6 +584,18 @@ onMounted(() => {
   cargarUsuarios()
   cargarRoles()
 })
+
+const onNewUserAvatarChange = e => {
+  const file = e.target.files?.[0]
+  newUser.value.avatarFile = file || null
+  if (file) {
+    const reader = new FileReader()
+    reader.onload = ev => { newUserPreview.value = ev.target.result }
+    reader.readAsDataURL(file)
+  } else {
+    newUserPreview.value = ''
+  }
+}
 </script>
 
 <style scoped>

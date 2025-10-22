@@ -126,8 +126,6 @@ Route::put('/users/{id}/activate', [UserController::class, 'activate']);
 Route::get('/profile', [UserController::class, 'profile']);
 Route::put('/profile', [UserController::class, 'updateProfile']);
 
-Route::post('/login', [AuthController::class, 'login'])->name('api.login');
-Route::post('/logout', [AuthController::class, 'logout'])->name('api.logout');
 // Cambio de contraseña (stateless o por sesión)
 Route::put('/profile/password', [AuthController::class, 'updatePassword'])->name('api.profile.password');
 

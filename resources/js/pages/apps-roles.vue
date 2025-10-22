@@ -7,6 +7,8 @@ const roles = ref([])
 const permissions = ref([])
 const selectedRoleId = ref(null)
 const rolePermissionSet = ref(new Set())
+const roleTuInicio = ref('') // Vista inicial del rol (campo tu_inicio en BD)
+const availableRoutes = ref([]) // Rutas disponibles desde menús
 
 // Estados para gestión de roles
 const isAddRoleDialogVisible = ref(false)
@@ -31,6 +33,46 @@ const loadPermissions = async () => {
   permissions.value = data
 }
 
+const loadAvailableRoutes = async () => {
+  try {
+    const { data } = await axios.get('/api/menus')
+    // Crear lista de rutas desde los menús y submenús
+    const routes = []
+    
+    data.forEach(menu => {
+      // Agregar el menú principal si tiene ruta
+      if (menu.route) {
+        routes.push({ 
+          title: menu.name, 
+          value: menu.route 
+        })
+      }
+      
+      // Agregar submenús si existen
+      if (menu.submenus && menu.submenus.length > 0) {
+        menu.submenus.forEach(submenu => {
+          if (submenu.route) {
+            routes.push({ 
+              title: `${menu.name} - ${submenu.name}`, 
+              value: submenu.route 
+            })
+          }
+        })
+      }
+    })
+    
+    availableRoutes.value = routes
+    console.log('Rutas cargadas:', routes) // Debug
+  } catch (error) {
+    console.error('Error cargando rutas:', error)
+    // Fallback a rutas por defecto si falla
+    availableRoutes.value = [
+      { title: 'Dashboard', value: '/dashboard-inicio' },
+      { title: 'Perfil', value: '/perfil' },
+    ]
+  }
+}
+
 const loadRolePermissions = async (roleId) => {
   if (!roleId) return
   const { data } = await axios.get(`/api/roles/${roleId}/permissions`)
@@ -45,13 +87,18 @@ const togglePermission = (permId) => {
 }
 
 const savePermissions = async () => {
-  await axios.put(`/api/roles/${selectedRoleId.value}/permissions`, { permission_ids: Array.from(rolePermissionSet.value) })
+  await axios.put(`/api/roles/${selectedRoleId.value}/permissions`, { 
+    permission_ids: Array.from(rolePermissionSet.value),
+    tu_inicio: roleTuInicio.value
+  })
+  await loadRoles() // Recargar roles para actualizar
 }
 
 // Abrir/cerrar diálogo de permisos de un rol
 const openPermissionsDialog = async (role) => {
   roleForPermissions.value = role
   selectedRoleId.value = role.id
+  roleTuInicio.value = role.tu_inicio || '/dashboard-inicio' // Cargar vista inicial
   // Asegurar permisos cargados y permisos del rol
   if (!permissions.value.length) await loadPermissions()
   await loadRolePermissions(role.id)
@@ -93,7 +140,7 @@ const onRoleUpdated = () => {
 }
 
 onMounted(async () => {
-  await Promise.all([loadRoles(), loadPermissions()])
+  await Promise.all([loadRoles(), loadPermissions(), loadAvailableRoutes()])
   await loadRolePermissions(selectedRoleId.value)
 })
 </script>
@@ -172,47 +219,74 @@ onMounted(async () => {
     </v-card>
 
     <!-- Diálogo de permisos por rol -->
-    <v-dialog v-model="isPermissionsDialogOpen" max-width="800px" persistent>
+    <v-dialog v-model="isPermissionsDialogOpen" max-width="750px" persistent>
       <v-card>
-        <v-card-title class="d-flex justify-space-between align-center">
-          <span class="text-h6">Permisos del rol: {{ roleForPermissions?.nombre }}</span>
-          <v-btn icon="tabler-x" variant="text" @click="closePermissionsDialog" />
+        <!-- Header destacado con rol -->
+        <v-card-title class="pa-4 bg-primary">
+          <div class="d-flex justify-space-between align-center">
+            <div class="d-flex align-center gap-2">
+              <v-icon icon="tabler-shield-check" size="28" color="white" />
+              <span class="text-h6 text-white font-weight-bold">{{ roleForPermissions?.nombre }}</span>
+            </div>
+            <v-btn icon="tabler-x" variant="text" color="white" size="small" @click="closePermissionsDialog" />
+          </div>
         </v-card-title>
-        <v-card-text>
-          <v-table>
+
+        <v-card-text class="pa-4">
+          <!-- Selector de vista inicial - compacto -->
+          <v-card variant="outlined" class="mb-4">
+            <v-card-text class="pa-3">
+              <div class="d-flex align-center gap-2 mb-2">
+                <v-icon icon="tabler-home" size="18" color="primary" />
+                <span class="text-subtitle-2 font-weight-medium">Vista Inicial</span>
+              </div>
+              <v-select
+                v-model="roleTuInicio"
+                :items="availableRoutes"
+                density="compact"
+                variant="outlined"
+                hide-details
+                placeholder="Selecciona la vista inicial"
+              />
+            </v-card-text>
+          </v-card>
+
+          <!-- Tabla de permisos sin columna Acción -->
+          <div class="text-subtitle-2 font-weight-medium mb-2">Permisos de Acceso</div>
+          <v-table density="compact" class="permissions-table">
             <thead>
               <tr>
-                <th>Permiso</th>
-                <th>Acción</th>
-                <th>Sección</th>
-                <th class="text-center">Habilitado</th>
+                <th>PERMISO</th>
+                <th>SECCIÓN</th>
+                <th class="text-center" style="width: 100px;">HABILITADO</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="p in permissions" :key="p.id">
                 <td>{{ p.name }}</td>
                 <td>
-                  <v-chip size="small" :color="p.action === 'read' ? 'info' : 'success'">
-                    {{ p.action }}
-                  </v-chip>
+                  <v-chip size="small" variant="tonal">{{ p.subject }}</v-chip>
                 </td>
-                <td>{{ p.subject }}</td>
                 <td class="text-center">
                   <v-switch
                     :model-value="rolePermissionSet.has(p.id)"
                     @update:model-value="togglePermission(p.id)"
                     color="primary"
                     hide-details
+                    density="compact"
                   />
                 </td>
               </tr>
             </tbody>
           </v-table>
         </v-card-text>
-        <v-card-actions>
+
+        <v-divider />
+
+        <v-card-actions class="pa-3">
           <v-spacer />
-          <v-btn color="grey" variant="text" @click="closePermissionsDialog">Cancelar</v-btn>
-          <v-btn color="primary" @click="async () => { await savePermissions(); closePermissionsDialog() }">Guardar</v-btn>
+          <v-btn color="grey" variant="text" size="small" @click="closePermissionsDialog">Cancelar</v-btn>
+          <v-btn color="primary" size="small" @click="async () => { await savePermissions(); closePermissionsDialog() }">Guardar</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -230,3 +304,24 @@ onMounted(async () => {
     />
   </div>
 </template>
+
+<style scoped>
+.permissions-table {
+  border: 1px solid rgba(var(--v-border-color), 0.12);
+  border-radius: 6px;
+}
+
+.permissions-table thead {
+  background-color: rgba(var(--v-theme-surface-variant), 0.4);
+}
+
+.permissions-table thead th {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.permissions-table tbody tr:hover {
+  background-color: rgba(var(--v-theme-primary), 0.04);
+}
+</style>

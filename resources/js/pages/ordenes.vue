@@ -2,11 +2,11 @@
   <VRow>
     <VCol cols="12">
       <!-- Header -->
-      <VCard class="mb-6">
-        <VCardText>
+      <VCard class="mb-2">
+        <VCardText class="py-2">
           <div class="d-flex justify-space-between align-center">
             <div>
-              <h2 class="text-h4 mb-2">Gestión de Órdenes</h2>
+              <h2 class="text-h4 mb-1">Gestión de Órdenes</h2>
               <p class="text-body-1 mb-0">Administra las órdenes de compra</p>
             </div>
             <VBtn 
@@ -21,8 +21,8 @@
       </VCard>
 
       <!-- Filtros -->
-      <VCard class="mb-6">
-        <VCardText>
+      <VCard class="mb-2">
+        <VCardText class="py-2">
           <VRow>
             <VCol cols="12" md="4">
               <VTextField

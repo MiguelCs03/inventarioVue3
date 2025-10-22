@@ -30,11 +30,18 @@ class PermissionController extends Controller
         $data = $request->validate([
             'permission_ids' => 'array',
             'permission_ids.*' => 'integer|exists:permissions,id',
+            'tu_inicio' => 'nullable|string|max:255', // Validar vista inicial
         ]);
 
         $role = Role::findOrFail($roleId);
         $role->permissions()->sync($data['permission_ids'] ?? []);
+        
+        // Actualizar campo tu_inicio si se envió
+        if (isset($data['tu_inicio'])) {
+            $role->tu_inicio = $data['tu_inicio'];
+            $role->save();
+        }
 
-        return response()->json(['message' => 'Permisos del rol actualizados correctamente']);
+        return response()->json(['message' => 'Permisos y configuración del rol actualizados correctamente']);
     }
 }

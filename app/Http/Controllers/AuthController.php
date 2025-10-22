@@ -12,11 +12,23 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $validated = $request->validate([
-            'email' => 'required|email',
+            'email' => 'required|string', // Ahora acepta email o username
             'password' => 'required|string',
         ]);
 
-        if (Auth::attempt($validated)) {
+        // Determinar si el input es email o username
+        $loginField = filter_var($validated['email'], FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+        $credentials = [
+            $loginField => $validated['email'],
+            'password' => $validated['password']
+        ];
+
+        if (Auth::attempt($credentials)) {
+            // Regenerar sesión solo si existe (route en web.php)
+            if ($request->hasSession()) {
+                $request->session()->regenerate();
+            }
+            
             $user = Auth::user();
 
             // Crear un token simple 
@@ -94,21 +106,26 @@ class AuthController extends Controller
                 'abilityRules' => $userAbilityRules,
             ]);
 
+            // Determinar homeRoute desde el tu_inicio del rol principal o usar default
+            $homeRoute = $user->roles->first()?->tu_inicio ?? '/dashboard-inicio';
+
             return response()->json([
                 'accessToken' => $token,
                 'userData' => [
                     'id' => $user->id,
                     'name' => $user->name,
+                    'username' => $user->username ?? $user->name,
                     'email' => $user->email,
+                    'numero' => $user->numero,
                     'fullName' => $user->name, // Alias para compatibilidad frontend
-                    'username' => $user->name, // Alias para compatibilidad frontend
                     'role' => $user->roles->first()?->nombre ?? 'Usuario', // Rol principal para mostrar
                     'roles' => $user->roles->pluck('nombre')->toArray(),
                     'permissions' => array_unique($userPermissions),
                     'allowedSections' => array_unique($allowedSections),
+                    'avatar' => $user->avatar ? asset('storage/' . $user->avatar) : null,
                 ],
                 'userAbilityRules' => $userAbilityRules,
-                'homeRoute' => '/dashboard-inicio',
+                'homeRoute' => $homeRoute,
             ]);
         }
 
