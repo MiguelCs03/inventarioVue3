@@ -1,52 +1,49 @@
 <template>
   <VRow>
     <VCol cols="12">
-      <!-- Header -->
-      <VCard class="mb-2">
-        <VCardText class="py-2">
-          <div class="d-flex justify-space-between align-center">
+      <!-- Header con título, búsqueda y filtros -->
+      <VCard class="mb-2 no-padding-card">
+        <VCardText class="py-2 px-4">
+          <div class="d-flex justify-space-between align-center flex-wrap ga-4">
             <div>
               <h2 class="text-h4 mb-1">Gestión de Compras</h2>
               <p class="text-body-1 mb-0">Administra las compras a proveedores</p>
             </div>
-            <VBtn 
-              color="primary" 
-              prepend-icon="tabler-plus"
-              @click="abrirModalCrear"
-            >
-              Nueva Compra
-            </VBtn>
-          </div>
-        </VCardText>
-      </VCard>
 
-      <!-- Filtros -->
-      <VCard class="mb-2">
-        <VCardText class="py-2">
-          <VRow>
-            <VCol cols="12" md="6">
+            <div class="d-flex align-center ga-3">
               <VTextField
                 v-model="filtros.search"
-                label="Buscar por proveedor o estado"
-                placeholder="Buscar..."
+                label="Buscar compra"
+                placeholder="Buscar por proveedor..."
                 prepend-inner-icon="tabler-search"
                 clearable
+                density="comfortable"
+                hide-details
+                style="min-width: 220px;"
                 @input="buscarCompras"
               />
-            </VCol>
-            <VCol cols="12" md="3">
+
               <VSelect
                 v-model="filtros.estado"
                 label="Estado"
                 :items="estadoOptions"
                 clearable
+                density="comfortable"
+                hide-details
+                style="min-width: 180px;"
                 @update:model-value="buscarCompras"
               />
-            </VCol>
-            <VCol cols="12" md="3">
-              
-            </VCol>
-          </VRow>
+
+              <VBtn 
+                color="success" 
+                variant="outlined"
+                prepend-icon="tabler-plus"
+                @click="abrirModalCrear"
+              >
+                Nueva Compra
+              </VBtn>
+            </div>
+          </div>
         </VCardText>
       </VCard>
 
@@ -161,7 +158,8 @@
                 <VCol cols="12">
                   <h4 class="mb-2">Productos</h4>
                   <VBtn
-                    color="primary"
+                    color="success"
+                    variant="outlined"
                     size="small"
                     prepend-icon="tabler-plus"
                     @click="agregarItem"
@@ -239,14 +237,14 @@
           <VCardActions>
             <VSpacer />
             <VBtn 
-              color="grey" 
-              variant="text"
+              color="error" 
+              variant="outlined"
               @click="cerrarModal"
             >
               Cancelar
             </VBtn>
             <VBtn 
-              color="primary" 
+              color="success" 
               variant="elevated"
               :loading="guardando"
               :disabled="compraForm.items.length === 0"
@@ -567,3 +565,14 @@ definePage({
   }
 })
 </script>
+
+<style scoped>
+.no-padding-card .v-card-text {
+  padding-top: 8px !important;
+  padding-bottom: 8px !important;
+}
+
+.no-padding-card {
+  margin-bottom: 8px !important;
+}
+</style>

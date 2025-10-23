@@ -1,52 +1,49 @@
 <template>
   <VRow>
     <VCol cols="12">
-      <!-- Header -->
-      <VCard class="mb-2">
-        <VCardText class="py-2">
-          <div class="d-flex justify-space-between align-center">
+      <!-- Header con título, búsqueda y filtros -->
+      <VCard class="mb-2 no-padding-card">
+        <VCardText class="py-2 px-4">
+          <div class="d-flex justify-space-between align-center flex-wrap ga-4">
             <div>
               <h2 class="text-h4 mb-1">Gestión de Proveedores</h2>
               <p class="text-body-1 mb-0">Administra los proveedores del sistema</p>
             </div>
-            <VBtn 
-              color="primary" 
-              prepend-icon="tabler-plus"
-              @click="abrirModalCrear"
-            >
-              Nuevo Proveedor
-            </VBtn>
-          </div>
-        </VCardText>
-      </VCard>
 
-      <!-- Filtros -->
-      <VCard class="mb-2">
-        <VCardText class="py-2">
-          <VRow>
-            <VCol cols="12" md="6">
+            <div class="d-flex align-center ga-3">
               <VTextField
                 v-model="filtros.search"
                 label="Buscar proveedor"
-                placeholder="Buscar por nombre, contacto, email..."
+                placeholder="Buscar por nombre, contacto..."
                 prepend-inner-icon="tabler-search"
                 clearable
+                density="comfortable"
+                hide-details
+                style="min-width: 220px;"
                 @input="buscarProveedores"
               />
-            </VCol>
-            <VCol cols="12" md="3">
+
               <VSelect
                 v-model="filtros.activo"
                 label="Estado"
                 :items="estadoOptions"
                 clearable
+                density="comfortable"
+                hide-details
+                style="min-width: 180px;"
                 @update:model-value="buscarProveedores"
               />
-            </VCol>
-            <VCol cols="12" md="3">
-              
-            </VCol>
-          </VRow>
+
+              <VBtn 
+                color="success" 
+                variant="outlined"
+                prepend-icon="tabler-plus"
+                @click="abrirModalCrear"
+              >
+                Nuevo Proveedor
+              </VBtn>
+            </div>
+          </div>
         </VCardText>
       </VCard>
 
@@ -67,7 +64,7 @@
             <div class="d-flex align-center">
               <VAvatar
                 size="40"
-                color="primary"
+                color="info"
                 variant="tonal"
                 class="me-3"
               >
@@ -108,12 +105,12 @@
               <VBtn
                 icon="tabler-pencil"
                 size="small"
-                color="primary"
+                color="warning"
                 variant="text"
                 @click="editarProveedor(item)"
               />
               <VBtn
-                :icon="item.activo ? 'tabler-user-off' : 'tabler-user-check'"
+                :icon="item.activo ? 'tabler-lock' : 'tabler-lock-open'"
                 size="small"
                 :color="item.activo ? 'warning' : 'success'"
                 variant="text"
@@ -189,14 +186,14 @@
           <VCardActions>
             <VSpacer />
             <VBtn 
-              color="grey" 
-              variant="text"
+              color="error" 
+              variant="outlined"
               @click="cerrarModal"
             >
               Cancelar
             </VBtn>
             <VBtn 
-              color="primary" 
+              color="success" 
               variant="elevated"
               :loading="guardando"
               @click="guardarProveedor"
@@ -227,7 +224,7 @@
               <VCol cols="12" class="text-center pb-6">
                 <VAvatar
                   size="80"
-                  color="primary"
+                  color="info"
                   variant="tonal"
                 >
                   {{ obtenerIniciales(proveedorDetalle) }}
@@ -471,3 +468,14 @@ definePage({
   }
 })
 </script>
+
+<style scoped>
+.no-padding-card .v-card-text {
+  padding-top: 8px !important;
+  padding-bottom: 8px !important;
+}
+
+.no-padding-card {
+  margin-bottom: 8px !important;
+}
+</style>

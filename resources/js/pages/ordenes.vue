@@ -1,52 +1,49 @@
 <template>
   <VRow>
     <VCol cols="12">
-      <!-- Header -->
-      <VCard class="mb-2">
-        <VCardText class="py-2">
-          <div class="d-flex justify-space-between align-center">
+      <!-- Header con título, búsqueda y filtros -->
+      <VCard class="mb-2 no-padding-card">
+        <VCardText class="py-2 px-4">
+          <div class="d-flex justify-space-between align-center flex-wrap ga-4">
             <div>
               <h2 class="text-h4 mb-1">Gestión de Órdenes</h2>
               <p class="text-body-1 mb-0">Administra las órdenes de compra</p>
             </div>
-            <VBtn 
-              color="primary" 
-              prepend-icon="tabler-plus"
-              @click="abrirModalCrear"
-            >
-              Nueva Orden
-            </VBtn>
-          </div>
-        </VCardText>
-      </VCard>
 
-      <!-- Filtros -->
-      <VCard class="mb-2">
-        <VCardText class="py-2">
-          <VRow>
-            <VCol cols="12" md="4">
+            <div class="d-flex align-center ga-3">
               <VTextField
                 v-model="filtros.search"
                 label="Buscar por cliente"
                 placeholder="Buscar cliente..."
                 prepend-inner-icon="tabler-search"
                 clearable
+                density="comfortable"
+                hide-details
+                style="min-width: 220px;"
                 @input="buscarOrdenes"
               />
-            </VCol>
-            <VCol cols="12" md="3">
+
               <VSelect
                 v-model="filtros.estado"
                 label="Estado"
                 :items="estadoOptions"
                 clearable
+                density="comfortable"
+                hide-details
+                style="min-width: 180px;"
                 @update:model-value="buscarOrdenes"
               />
-            </VCol>
-            <VCol cols="12" md="3">
-                
-            </VCol>
-          </VRow>
+
+              <VBtn 
+                color="success" 
+                variant="outlined"
+                prepend-icon="tabler-plus"
+                @click="abrirModalCrear"
+              >
+                Nueva Orden
+              </VBtn>
+            </div>
+          </div>
         </VCardText>
       </VCard>
 
@@ -110,7 +107,7 @@
               <VBtn
                 icon="tabler-pencil"
                 size="small"
-                color="primary"
+                color="warning"
                 variant="text"
                 @click="editarOrden(item)"
                 :disabled="item.estado === 'confirmada'"
@@ -201,7 +198,8 @@
                 <VCardTitle class="d-flex justify-space-between align-center">
                   <span class="text-h6">Items de la Orden</span>
                   <VBtn
-                    color="primary"
+                    color="success"
+                    variant="outlined"
                     size="small"
                     prepend-icon="tabler-plus"
                     @click="agregarItem"
@@ -299,14 +297,14 @@
           <VCardActions>
             <VSpacer />
             <VBtn 
-              color="grey" 
-              variant="text"
+              color="error" 
+              variant="outlined"
               @click="cerrarModal"
             >
               Cancelar
             </VBtn>
             <VBtn 
-              color="primary" 
+              color="success" 
               variant="elevated"
               :loading="guardando"
               :disabled="ordenForm.items.length === 0"
@@ -448,7 +446,8 @@
               <VCardTitle class="d-flex justify-space-between align-center">
                 <span class="text-h6">Métodos de Pago</span>
                 <VBtn
-                  color="primary"
+                  color="success"
+                  variant="outlined"
                   size="small"
                   prepend-icon="tabler-plus"
                   @click="agregarPago"
@@ -546,8 +545,8 @@
           <VCardActions>
             <VSpacer />
             <VBtn 
-              color="grey" 
-              variant="text"
+              color="error" 
+              variant="outlined"
               @click="cerrarModalConfirmar"
             >
               Cancelar
@@ -937,3 +936,14 @@ definePage({
   }
 })
 </script>
+
+<style scoped>
+.no-padding-card .v-card-text {
+  padding-top: 8px !important;
+  padding-bottom: 8px !important;
+}
+
+.no-padding-card {
+  margin-bottom: 8px !important;
+}
+</style>

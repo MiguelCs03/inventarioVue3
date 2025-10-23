@@ -3,75 +3,47 @@
     <!-- Header con título y botón de nuevo usuario -->
     <VCard class="mb-2 no-padding-card">
       <VCardText class="py-2 px-4">
-        <div class="d-flex justify-space-between align-center">
+        <div class="d-flex justify-space-between align-center flex-wrap ga-4">
+
           <div>
             <h2 class="text-h4 mb-1">Gestión de Usuarios</h2>
             <p class="text-body-1 mb-0">Administra los usuarios del sistema</p>
           </div>
-          <VBtn 
-            color="primary" 
-            prepend-icon="mdi-plus"
-            @click="crearUsuario"
-          >
-            Nuevo Usuario
-          </VBtn>
+
+          <div class="d-flex align-center ga-3">
+            <!--Buscasdor de usuarios-->
+            <VTextField v-model="search" label="Buscar usuario" placeholder="Buscar por nombre, email..."
+              prepend-inner-icon="mdi-magnify" clearable density="comfortable" hide-details style="min-width: 220px;" />
+
+            <VSelect v-model="selectedRole" :items="roleOptions" label="Filtrar por rol" clearable density="comfortable"
+              hide-details style="min-width: 200px;" />
+
+            <VBtn color="success" variant="outlined" prepend-icon="mdi-plus" @click="crearUsuario">
+              Nuevo Usuario
+            </VBtn>
+
+          </div>
         </div>
       </VCardText>
     </VCard>
 
-    <!-- Filtros y búsqueda -->
-    <VCard class="mb-2 no-padding-card">
-      <VCardText class="py-2 px-4">
-        <VRow>
-          <VCol cols="12" md="8">
-            <VTextField
-              v-model="search"
-              label="Buscar usuario"
-              placeholder="Buscar por nombre, email..."
-              prepend-inner-icon="mdi-magnify"
-              clearable
-              density="comfortable"
-            />
-          </VCol>
-          <VCol cols="12" md="4">
-            <VSelect
-              v-model="selectedRole"
-              :items="roleOptions"
-              label="Filtrar por rol"
-              clearable
-              density="comfortable"
-            />
-          </VCol>
-        </VRow>
-      </VCardText>
-    </VCard>
+
 
     <!-- Tabla de usuarios -->
     <VCard>
-      <VDataTable
-        v-model:page="page"
-        :headers="headers"
-        :items="filteredUsers"
-        :loading="loading"
-        :items-per-page="itemsPerPage"
-        :search="search"
-        class="elevation-1"
-      >
+      <VDataTable v-model:page="page" :headers="headers" :items="filteredUsers" :loading="loading"
+        :items-per-page="itemsPerPage" :search="search" class="elevation-1">
         <!-- Columna de roles (concatena nombres) -->
         <template #item.roles="{ item }">
           <span>
-            {{ Array.isArray(item.roles) && item.roles.length
+            {{Array.isArray(item.roles) && item.roles.length
               ? item.roles.map(r => r?.nombre).filter(Boolean).join(', ')
-              : '—' }}
+              : '—'}}
           </span>
         </template>
         <!-- Estado activo/inactivo -->
         <template #item.activo="{ item }">
-          <VChip
-            :color="item.activo ? 'success' : 'error'"
-            size="small"
-            variant="tonal"
-          >
+          <VChip :color="item.activo ? 'success' : 'error'" size="small" variant="tonal">
             {{ item.activo ? 'ACTIVO' : 'INACTIVO' }}
           </VChip>
         </template>
@@ -80,31 +52,14 @@
         <template #item.actions="{ item }">
           <div class="d-flex gap-2">
             <!-- Editar -->
-            <VBtn
-              icon="tabler-pencil"
-              size="small"
-              color="primary"
-              variant="text"
-              @click="editarUsuario(item)"
-            />
-            
+            <VBtn icon="tabler-pencil" size="small" color="primary" variant="text" @click="editarUsuario(item)" />
+
             <!-- Activar/Desactivar (Candado) -->
-            <VBtn
-              :icon="item.activo ? 'tabler-lock' : 'tabler-lock-open'"
-              size="small"
-              :color="item.activo ? 'warning' : 'success'"
-              variant="text"
-              @click="toggleEstadoUsuario(item)"
-            />
-            
+            <VBtn :icon="item.activo ? 'tabler-lock' : 'tabler-lock-open'" size="small"
+              :color="item.activo ? 'warning' : 'success'" variant="text" @click="toggleEstadoUsuario(item)" />
+
             <!-- Ver detalles -->
-            <VBtn
-              icon="tabler-eye"
-              size="small"
-              color="info"
-              variant="text"
-              @click="verUsuario(item)"
-            />
+            <VBtn icon="tabler-eye" size="small" color="info" variant="text" @click="verUsuario(item)" />
           </div>
         </template>
 
@@ -120,119 +75,70 @@
     </VCard>
 
     <!-- Modal para crear nuevo usuario -->
-    <VDialog 
-      v-model="showCreateDialog" 
-      max-width="600px"
-      persistent
-    >
+    <VDialog v-model="showCreateDialog" max-width="600px" persistent>
       <VCard>
         <VCardTitle class="headline">
           <span class="text-h5">Crear Nuevo Usuario</span>
         </VCardTitle>
-        
+
         <VCardText>
           <VContainer>
             <VRow>
-             <!-- añadir imagen de perfil -->
-                <VCol cols="12" class="d-flex flex-column align-center">
-                  <VAvatar size="96" class="mb-2">
-                    <VImg v-if="newUserPreview" :src="newUserPreview" />
-                    <VIcon v-else icon="tabler-user" size="48" />
-                  </VAvatar>
-                  <input type="file" accept="image/*" @change="onNewUserAvatarChange" />
-                </VCol>
-              <VCol cols="12" md="6">
-                <VTextField
-                  v-model="newUser.name"
-                  label="Nombre completo"
-                  required
-                  prepend-inner-icon="mdi-account"
-                />
+              <!-- añadir imagen de perfil -->
+              <VCol cols="12" class="d-flex flex-column align-center">
+                <VAvatar size="96" class="mb-2">
+                  <VImg v-if="newUserPreview" :src="newUserPreview" />
+                  <VIcon v-else icon="tabler-user" size="48" />
+                </VAvatar>
+                <input type="file" accept="image/*" @change="onNewUserAvatarChange" />
               </VCol>
-              
               <VCol cols="12" md="6">
-                <VTextField
-                  v-model="newUser.username"
-                  label="Nombre de usuario"
-                  placeholder="usuario123"
-                  prepend-inner-icon="mdi-at"
-                />
+                <VTextField v-model="newUser.name" label="Nombre completo" required prepend-inner-icon="mdi-account" />
               </VCol>
-              
+
               <VCol cols="12" md="6">
-                <VTextField
-                  v-model="newUser.email"
-                  label="Email"
-                  type="email"
-                  required
-                  prepend-inner-icon="mdi-email"
-                />
+                <VTextField v-model="newUser.username" label="Nombre de usuario" placeholder="usuario123"
+                  prepend-inner-icon="mdi-at" />
               </VCol>
-              
+
               <VCol cols="12" md="6">
-                <VTextField
-                  v-model="newUser.numero"
-                  label="Número de celular"
-                  placeholder="+591 70123456"
-                  prepend-inner-icon="mdi-phone"
-                />
+                <VTextField v-model="newUser.email" label="Email" type="email" required
+                  prepend-inner-icon="mdi-email" />
               </VCol>
-              
+
               <VCol cols="12" md="6">
-                <VTextField
-                  v-model="newUser.password"
-                  label="Contraseña"
-                  type="password"
-                  required
-                  prepend-inner-icon="mdi-lock"
-                />
+                <VTextField v-model="newUser.numero" label="Número de celular" placeholder="+591 70123456"
+                  prepend-inner-icon="mdi-phone" />
               </VCol>
-              
+
               <VCol cols="12" md="6">
-                <VTextField
-                  v-model="newUser.fecha_nacimiento"
-                  label="Fecha de nacimiento"
-                  type="date"
-                  prepend-inner-icon="mdi-calendar"
-                />
+                <VTextField v-model="newUser.password" label="Contraseña" type="password" required
+                  prepend-inner-icon="mdi-lock" />
               </VCol>
-              
+
               <VCol cols="12" md="6">
-                <VTextField
-                  v-model="newUser.cargo"
-                  label="Cargo"
-                  prepend-inner-icon="mdi-briefcase"
-                />
+                <VTextField v-model="newUser.fecha_nacimiento" label="Fecha de nacimiento" type="date"
+                  prepend-inner-icon="mdi-calendar" />
               </VCol>
-              
+
               <VCol cols="12" md="6">
-                <VSelect
-                  v-model="newUser.role_id"
-                  :items="roles"
-                  item-title="nombre"
-                  item-value="id"
-                  label="Rol"
-                  prepend-inner-icon="mdi-account-group"
-                />
+                <VTextField v-model="newUser.cargo" label="Cargo" prepend-inner-icon="mdi-briefcase" />
+              </VCol>
+
+              <VCol cols="12" md="6">
+                <VSelect v-model="newUser.role_id" :items="roles" item-title="nombre" item-value="id" label="Rol"
+                  prepend-inner-icon="mdi-account-group" />
               </VCol>
             </VRow>
           </VContainer>
         </VCardText>
-        
+
         <VCardActions>
           <VSpacer />
-          <VBtn 
-            color="grey" 
-            variant="text"
-            @click="showCreateDialog = false; resetForm()"
-          >
+          <VBtn color="error" variant="outlined" @click="showCreateDialog = false; resetForm()">
             Cancelar
           </VBtn>
-          <VBtn 
-            color="primary" 
-            variant="elevated"
-            @click="guardarNuevoUsuario"
-          >
+          <VBtn color="success" variant="elevated" @click="guardarNuevoUsuario">
             Guardar
           </VBtn>
         </VCardActions>
@@ -240,52 +146,33 @@
     </VDialog>
 
     <!-- Modal para editar usuario -->
-    <EditUserModal
-      :user="usuarioEditando"
-      :isOpen="isEditModalOpen"
-      @close="isEditModalOpen = false"
-      @updated="actualizarUsuario"
-    />
+    <EditUserModal :user="usuarioEditando" :isOpen="isEditModalOpen" @close="isEditModalOpen = false"
+      @updated="actualizarUsuario" />
 
     <!-- Modal Ver Detalles -->
-    <VDialog 
-      v-model="modalVerVisible" 
-      max-width="600px"
-    >
+    <VDialog v-model="modalVerVisible" max-width="600px">
       <VCard v-if="usuarioDetalle">
         <VCardTitle class="d-flex justify-space-between align-center">
           <span class="text-h5">Detalles del Usuario</span>
-          <VBtn
-            icon="tabler-x"
-            variant="text"
-            @click="modalVerVisible = false"
-          />
+          <VBtn icon="tabler-x" variant="text" @click="modalVerVisible = false" />
         </VCardTitle>
-        
+
         <VCardText>
           <VRow>
             <VCol cols="12" class="text-center pb-6">
-              <VAvatar
-                size="96"
-                :color="!usuarioDetalle.avatar_url ? 'primary' : undefined"
-                :variant="!usuarioDetalle.avatar_url ? 'tonal' : undefined"
-              >
+              <VAvatar size="96" :color="!usuarioDetalle.avatar_url ? 'primary' : undefined"
+                :variant="!usuarioDetalle.avatar_url ? 'tonal' : undefined">
                 <VImg v-if="usuarioDetalle.avatar_url" :src="usuarioDetalle.avatar_url" />
                 <span v-else class="text-h4">{{ obtenerIniciales(usuarioDetalle) }}</span>
               </VAvatar>
               <h3 class="mt-4">
                 {{ usuarioDetalle.name }}
               </h3>
-              <VChip
-                :color="usuarioDetalle.activo ? 'success' : 'error'"
-                size="small"
-                variant="tonal"
-                class="mt-2"
-              >
+              <VChip :color="usuarioDetalle.activo ? 'success' : 'error'" size="small" variant="tonal" class="mt-2">
                 {{ usuarioDetalle.activo ? 'ACTIVO' : 'INACTIVO' }}
               </VChip>
             </VCol>
-            
+
             <VCol cols="6">
               <div class="text-body-2 text-medium-emphasis mb-1">
                 <VIcon icon="tabler-mail" size="16" class="me-1" />
@@ -293,7 +180,7 @@
               </div>
               <div class="text-body-1">{{ usuarioDetalle.email }}</div>
             </VCol>
-            
+
             <VCol cols="6">
               <div class="text-body-2 text-medium-emphasis mb-1">
                 <VIcon icon="tabler-at" size="16" class="me-1" />
@@ -301,7 +188,7 @@
               </div>
               <div class="text-body-1">{{ usuarioDetalle.username || 'No especificado' }}</div>
             </VCol>
-            
+
             <VCol cols="6">
               <div class="text-body-2 text-medium-emphasis mb-1">
                 <VIcon icon="tabler-phone" size="16" class="me-1" />
@@ -309,7 +196,7 @@
               </div>
               <div class="text-body-1">{{ usuarioDetalle.numero || 'No especificado' }}</div>
             </VCol>
-            
+
             <VCol cols="6">
               <div class="text-body-2 text-medium-emphasis mb-1">
                 <VIcon icon="tabler-briefcase" size="16" class="me-1" />
@@ -317,21 +204,15 @@
               </div>
               <div class="text-body-1">{{ usuarioDetalle.cargo || 'No especificado' }}</div>
             </VCol>
-            
+
             <VCol cols="12">
               <div class="text-body-2 text-medium-emphasis mb-1">
                 <VIcon icon="tabler-shield" size="16" class="me-1" />
                 Roles
               </div>
               <div class="text-body-1">
-                <VChip
-                  v-for="role in usuarioDetalle.roles"
-                  :key="role.id"
-                  size="small"
-                  color="primary"
-                  variant="tonal"
-                  class="me-1"
-                >
+                <VChip v-for="role in usuarioDetalle.roles" :key="role.id" size="small" color="primary" variant="tonal"
+                  class="me-1">
                   {{ role.nombre }}
                 </VChip>
                 <span v-if="!usuarioDetalle.roles || usuarioDetalle.roles.length === 0">
@@ -339,7 +220,7 @@
                 </span>
               </div>
             </VCol>
-            
+
             <VCol cols="6">
               <div class="text-body-2 text-medium-emphasis mb-1">
                 <VIcon icon="tabler-calendar" size="16" class="me-1" />
@@ -347,7 +228,7 @@
               </div>
               <div class="text-body-1">{{ usuarioDetalle.fecha_nacimiento || 'No especificada' }}</div>
             </VCol>
-            
+
             <VCol cols="6">
               <div class="text-body-2 text-medium-emphasis mb-1">
                 <VIcon icon="tabler-clock" size="16" class="me-1" />
@@ -355,7 +236,7 @@
               </div>
               <div class="text-body-1">{{ formatearFecha(usuarioDetalle.created_at) }}</div>
             </VCol>
-            
+
             <VCol cols="12">
               <div class="text-body-2 text-medium-emphasis mb-1">
                 <VIcon icon="tabler-refresh" size="16" class="me-1" />
@@ -368,11 +249,7 @@
 
         <VCardActions>
           <VSpacer />
-          <VBtn
-            color="primary"
-            variant="elevated"
-            @click="modalVerVisible = false"
-          >
+          <VBtn color="success" variant="elevated" @click="modalVerVisible = false">
             Cerrar
           </VBtn>
         </VCardActions>
@@ -438,7 +315,7 @@ const filteredUsers = computed(() => {
   if (!Array.isArray(users.value)) {
     return []
   }
-  
+
   let filtered = users.value
 
   if (selectedRole.value) {
@@ -461,7 +338,7 @@ const cargarUsuarios = async () => {
   } catch (error) {
     console.error('Error al cargar usuarios:', error)
     users.value = [] // Asegurar que sea array en caso de error
-    
+
   } finally {
     loading.value = false
   }
@@ -567,10 +444,10 @@ const toggleEstadoUsuario = async (usuario) => {
   try {
     const endpoint = usuario.activo ? 'deactivate' : 'activate'
     await axios.put(`/api/users/${usuario.id}/${endpoint}`)
-    
+
     // Actualizar estado local
     usuario.activo = !usuario.activo
-    
+
     console.log(`Usuario ${usuario.activo ? 'activado' : 'desactivado'}`)
     // Aquí podrías mostrar un snackbar de éxito
   } catch (error) {
@@ -602,12 +479,13 @@ const onNewUserAvatarChange = e => {
 .elevation-1 {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
 }
- </style>
+</style>
 <style scoped>
 .no-padding-card .v-card-text {
   padding-top: 8px !important;
   padding-bottom: 8px !important;
 }
+
 .no-padding-card {
   margin-bottom: 8px !important;
 }

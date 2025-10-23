@@ -43,7 +43,9 @@ export const { themeConfig, layoutConfig } = defineThemeConfig({
     type: NavbarType.Sticky,
     navbarBlur: true,
   },
-  footer: { type: FooterType.Static },
+  //eso es para la barra que salí por defecto en el pie de pagina
+  //footer: { type: FooterType.Static },
+  footer: { type: FooterType.Hidden },
   verticalNav: {
     isVerticalNavCollapsed: false,
     defaultNavItemIconProps: { icon: 'tabler-circle' },
