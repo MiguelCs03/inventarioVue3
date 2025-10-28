@@ -42,6 +42,7 @@ const credentials = ref({
 const rememberMe = ref(false)
 
 import axios from 'axios'
+import { fetchMenus } from '@/store/menu'
 
 const login = async () => {
   try {
@@ -50,18 +51,24 @@ const login = async () => {
       password: credentials.value.password,
     })
 
-  const { accessToken, userData, userAbilityRules, homeRoute } = response.data
+    const { accessToken, userData, userAbilityRules, homeRoute } = response.data
 
     useCookie('userAbilityRules').value = userAbilityRules
     ability.update(userAbilityRules)
     useCookie('userData').value = userData
     useCookie('accessToken').value = accessToken
 
+    // Cargar menús antes de redirigir para que los guards tengan la info necesaria
+    await fetchMenus()
+
     // Redirect to `to` query if exist or redirect to index route
-    await nextTick(() => {
-      const target = route.query.to ? String(route.query.to) : (homeRoute ?? '/')
-      router.replace(target)
-    })
+    // Usar nextTick y luego un pequeño delay para asegurar que el router esté listo
+    await nextTick()
+    
+    const target = route.query.to ? String(route.query.to) : (homeRoute ?? '/')
+    
+    // Usar push en lugar de replace para que el router resuelva correctamente la ruta
+    router.push(target)
   } catch (err) {
     console.error('Error de login:', err)
     if (err.response && err.response.status === 422) {

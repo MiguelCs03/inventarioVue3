@@ -1,5 +1,6 @@
-import { fetchMenus, menus } from '@/store/menu'
+import { menus } from '@/store/menu'
 
-fetchMenus()
+// Nota: Evitamos llamar a fetchMenus aquí para no disparar axios durante el import.
+// El layout horizontal hará el fetch en onMounted.
 
 export default menus

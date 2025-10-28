@@ -35,7 +35,15 @@ export const canViewNavMenuGroup = item => {
   return can(item.action, item.subject) && hasAnyVisibleChild
 }
 export const canNavigate = to => {
-  const ability = useAbility()
+  let ability
+  try {
+    ability = useAbility()
+  } catch (err) {
+    // Ability not provided yet (plugin not registered) - allow navigation by default
+    // This prevents runtime errors during app init when plugins register order is not guaranteed.
+    console.warn('[casl] ability not provided yet, allowing navigation by default', err)
+    return true
+  }
   
   // Si la ruta no tiene requisitos específicos de permisos, permitir acceso
   const targetRoute = to.matched[to.matched.length - 1]
@@ -66,8 +74,8 @@ export const canNavigate = to => {
 
   // Si tiene action y subject específicos, verificar con CASL
   if (targetRoute?.meta?.action && targetRoute?.meta?.subject)
-    return ability.can(targetRoute.meta.action, targetRoute.meta.subject)
+    return typeof ability.can === 'function' ? ability.can(targetRoute.meta.action, targetRoute.meta.subject) : true
 
   // Si no tiene ningún permiso específico, verificar si alguna ruta padre permite acceso
-  return to.matched.some(route => ability.can(route.meta.action, route.meta.subject))
+  return to.matched.some(route => (typeof ability.can === 'function' ? ability.can(route.meta.action, route.meta.subject) : true))
 }

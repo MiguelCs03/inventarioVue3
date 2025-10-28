@@ -37,13 +37,42 @@
  * app.mount('#app')
  * ```
  */
-export const registerPlugins = app => {
-  const imports = import.meta.glob(['../../plugins/*.{ts,js}', '../../plugins/*/index.{ts,js}'], { eager: true })
-  const importPaths = Object.keys(imports).sort()
+export const registerPlugins = async (app, options = {}) => {
+  // Load plugin modules lazily to avoid eager evaluation side-effects
+  // (some plugins may execute code at module evaluation time and cause errors/recursion).
+  const modules = import.meta.glob(['../../plugins/*.{ts,js}', '../../plugins/*/index.{ts,js}'])
+  const importPaths = Object.keys(modules).sort()
 
-  importPaths.forEach(path => {
-    const pluginImportModule = imports[path]
+  const { verbose = true, skip = [] } = options
 
-    pluginImportModule.default?.(app)
-  })
+  for (const path of importPaths) {
+    // runtime skip patterns
+    if (path.includes('fake-api') || skip.some(s => path.includes(s))) {
+      if (verbose) console.info(`[plugins] Skipping plugin import ${path}`)
+      continue
+    }
+
+    if (verbose) console.info(`[plugins] Importing plugin ${path}`)
+
+    try {
+      // each modules[path] is a function that returns a promise resolving to the module
+      const pluginImportModule = await modules[path]()
+
+      if (pluginImportModule && typeof pluginImportModule.default === 'function') {
+        try {
+          if (verbose) console.info(`[plugins] Executing plugin ${path}`)
+          pluginImportModule.default(app)
+        } catch (err) {
+          console.error(`[plugins] Error while executing plugin ${path}`, err)
+          // don't stop the whole registration; continue to next plugin
+        }
+      } else {
+        if (verbose) console.info(`[plugins] No default export in ${path}`)
+      }
+    } catch (err) {
+      console.error(`[plugins] Error while importing plugin ${path}`, err)
+      // If import itself throws (circular import / eval-time error) we still continue so
+      // we can observe which plugins were already imported.
+    }
+  }
 }

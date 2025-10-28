@@ -571,8 +571,8 @@
 import axios from 'axios'
 import { computed, onMounted, reactive, ref } from 'vue'
 
-// Configurar la base URL de axios
-axios.defaults.baseURL = 'http://localhost:8000'
+// Nota: No forzar baseURL aquí. Usamos same-origin para que las cookies
+// de sesión se envíen correctamente (127.0.0.1 vs localhost pueden diferir).
 
 // Estado
 const loading = ref(false)

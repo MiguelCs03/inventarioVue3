@@ -138,7 +138,7 @@
           <VBtn color="error" variant="outlined" @click="showCreateDialog = false; resetForm()">
             Cancelar
           </VBtn>
-          <VBtn color="success" variant="elevated" @click="guardarNuevoUsuario">
+          <VBtn color="success" variant="elevated" @click="guardarNuevoUsuario" :loading="savingUser" :disabled="savingUser">
             Guardar
           </VBtn>
         </VCardActions>
@@ -265,6 +265,7 @@ import { computed, onMounted, ref } from 'vue'
 
 // Estados reactivos
 const loading = ref(false)
+const savingUser = ref(false)
 const search = ref('')
 const selectedRole = ref(null)
 const page = ref(1)
@@ -359,6 +360,9 @@ const crearUsuario = () => {
 }
 
 const guardarNuevoUsuario = async () => {
+  if (savingUser.value) return // Evitar doble clic
+  
+  savingUser.value = true
   try {
     // Enviar como multipart/form-data para incluir imagen
     const form = new FormData()
@@ -379,8 +383,12 @@ const guardarNuevoUsuario = async () => {
       form.append('avatar', newUser.value.avatarFile)
 
     const response = await axios.post('/api/users', form, {
-      headers: { 'Accept': 'application/json' },
+      headers: { 
+        'Accept': 'application/json',
+        'Content-Type': 'multipart/form-data'
+      },
     })
+    
     users.value.push(response.data)
     showCreateDialog.value = false
     resetForm()
@@ -388,7 +396,20 @@ const guardarNuevoUsuario = async () => {
     // Aquí podrías mostrar un snackbar de éxito
   } catch (error) {
     console.error('Error al crear usuario:', error)
+    
+    // Mostrar errores de validación si existen
+    if (error.response?.data?.errors) {
+      console.error('Errores de validación:', error.response.data.errors)
+    }
+    
+    // Si el error es 422 y el usuario ya existe, recargar la lista
+    if (error.response?.status === 422) {
+      console.warn('Error de validación, recargando usuarios...')
+      await cargarUsuarios()
+    }
     // Aquí podrías mostrar un snackbar de error
+  } finally {
+    savingUser.value = false
   }
 }
 

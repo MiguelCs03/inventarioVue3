@@ -13,8 +13,8 @@ import '@styles/styles.scss'
 const app = createApp(App)
 
 
-// Register plugins
-registerPlugins(app)
+// Register plugins (load lazily). Await so we can catch import-time errors in console.
+await registerPlugins(app)
 
 // Mount vue app
 app.mount('#app')

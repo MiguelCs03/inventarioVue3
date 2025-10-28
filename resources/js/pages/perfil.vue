@@ -121,6 +121,11 @@ const avatarFile = ref(null)
 const avatarPreview = ref('')
 const isAvatarLoading = ref(false)
 
+// Snackbar state
+const snackbar = ref(false)
+const snackbarMessage = ref('')
+const snackbarColor = ref('success')
+
 const openAvatarModal = () => {
   avatarModal.value = true
   avatarFile.value = null
@@ -167,16 +172,26 @@ const uploadAvatar = async () => {
       useCookie('userData').value = updatedUserData
       
       closeAvatarModal()
-      alert('Foto de perfil actualizada')
       
-      // Recargar la página para reflejar cambios en toda la app
-      window.location.reload()
+      // Mostrar snackbar de éxito
+      snackbarMessage.value = 'Foto de perfil actualizada correctamente'
+      snackbarColor.value = 'success'
+      snackbar.value = true
+      
+      // Recargar la página para reflejar cambios en toda la app después de un pequeño delay
+      setTimeout(() => {
+        window.location.reload()
+      }, 1500)
     } else {
-      alert(data.message || `Error al subir imagen (HTTP ${response.status})`)
+      snackbarMessage.value = data.message || `Error al subir imagen (HTTP ${response.status})`
+      snackbarColor.value = 'error'
+      snackbar.value = true
     }
   } catch (err) {
     console.error('Error al subir avatar:', err)
-    alert('Error de red')
+    snackbarMessage.value = 'Error de red al subir la imagen'
+    snackbarColor.value = 'error'
+    snackbar.value = true
   } finally {
     isAvatarLoading.value = false
   }
@@ -383,6 +398,23 @@ definePage({
         </VCardActions>
       </VCard>
     </VDialog>
+
+    <!-- Snackbar para notificaciones -->
+    <VSnackbar
+      v-model="snackbar"
+      :color="snackbarColor"
+      location="top"
+      :timeout="3000"
+      transition="slide-y-transition"
+    >
+      <div class="d-flex align-center gap-2">
+        <VIcon 
+          :icon="snackbarColor === 'success' ? 'tabler-circle-check' : 'tabler-alert-circle'"
+          size="24"
+        />
+        <span>{{ snackbarMessage }}</span>
+      </div>
+    </VSnackbar>
 
   </div>
 </template>

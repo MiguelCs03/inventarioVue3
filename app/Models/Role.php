@@ -15,10 +15,10 @@ class Role extends Model
         'activo',
     ];
 
-    // Relación: Un rol puede tener muchos usuarios (si usas pivot user_role, cámbialo a belongsToMany)
+    // Relación: Un rol puede tener muchos usuarios (many-to-many con tabla role_user)
     public function users()
     {
-        return $this->hasMany(User::class);
+        return $this->belongsToMany(User::class);
     }
 
     // Relación: Un rol puede tener muchos permisos (many-to-many)

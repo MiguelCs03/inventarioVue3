@@ -113,6 +113,20 @@ export default defineConfig({
   },
   build: {
     chunkSizeWarningLimit: 5000,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vuetify': ['vuetify'],
+          'vendor': ['vue', 'vue-router', 'pinia'],
+        }
+      }
+    },
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true,
+      }
+    }
   },
   optimizeDeps: {
     exclude: ['vuetify'],

@@ -26,7 +26,6 @@ class User extends Authenticatable
         'password',
         'fecha_nacimiento',
         'cargo',
-        'role_id',
         'avatar', 
     ];
 

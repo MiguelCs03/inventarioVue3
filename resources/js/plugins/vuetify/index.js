@@ -1,4 +1,3 @@
-import { deepMerge } from '@antfu/utils'
 import { useI18n } from 'vue-i18n'
 import { createVuetify } from 'vuetify'
 import { VBtn } from 'vuetify/components/VBtn'
@@ -33,7 +32,29 @@ export default function (app) {
     },
   }
 
-  const optionTheme = deepMerge({ themes }, cookieThemeValues)
+  // Avoid deepMerge which can run into recursion with reactive/circular values.
+  // Build a safe merged theme object by shallow-merging the color overrides only.
+  const optionTheme = {
+    defaultTheme: cookieThemeValues.defaultTheme,
+    themes: {
+      light: {
+        ...themes.light,
+        colors: {
+          ...themes.light.colors,
+          ...(cookieThemeValues.themes?.light?.colors || {}),
+        },
+        variables: { ...(themes.light.variables || {}) },
+      },
+      dark: {
+        ...themes.dark,
+        colors: {
+          ...themes.dark.colors,
+          ...(cookieThemeValues.themes?.dark?.colors || {}),
+        },
+        variables: { ...(themes.dark.variables || {}) },
+      },
+    },
+  }
 
   const vuetify = createVuetify({
     aliases: {
