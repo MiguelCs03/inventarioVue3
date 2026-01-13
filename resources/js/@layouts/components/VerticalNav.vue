@@ -36,6 +36,29 @@ const isHovered = useElementHover(refNav)
 provide(injectionKeyIsVerticalNavHovered, isHovered)
 
 const configStore = useLayoutConfigStore()
+import { computed, onMounted } from 'vue'
+import { useImagenesSistema } from '@/composables/useImagenesSistema'
+
+// Nombre de empresa reactivo
+const empresaNombre = computed(() => layoutConfig.app.title)
+
+// Imágenes activas (logo header, login, favicon, loader)
+const { imagenesActivas, obtenerTodasActivas } = useImagenesSistema()
+
+onMounted(async () => {
+  // Intentar cargar las imágenes activas para que el logo del nav use la imagen subida si existe
+  try {
+    await obtenerTodasActivas()
+  } catch (e) {
+    // no bloquear la navegación si falla
+    console.warn('No se pudieron cargar las imágenes activas para el nav', e)
+  }
+})
+
+const logoHeaderSrc = computed(() => {
+  const img = imagenesActivas.value?.logo_header
+  return img && img.ruta ? `/storage/${img.ruta}` : null
+})
 
 const resolveNavItemComponent = item => {
   if ('heading' in item)
@@ -87,14 +110,20 @@ const hideTitleAndIcon = configStore.isVerticalNavMini(isHovered)
           to="/"
           class="app-logo app-title-wrapper"
         >
-          <VNodeRenderer :nodes="layoutConfig.app.logo" />
+          <!-- Si hay un logo subido en la DB, usar la URL pública; si no, usar el logo por defecto del themeConfig -->
+          <template v-if="logoHeaderSrc">
+            <img :src="logoHeaderSrc" alt="logo" style="max-height:36px;" />
+          </template>
+          <template v-else>
+            <VNodeRenderer :nodes="layoutConfig.app.logo" />
+          </template>
 
           <Transition name="vertical-nav-app-title">
             <h1
               v-show="!hideTitleAndIcon"
               class="app-logo-title"
             >
-              {{ layoutConfig.app.title }}
+              {{ empresaNombre }}
             </h1>
           </Transition>
         </RouterLink>

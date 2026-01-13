@@ -54,6 +54,7 @@ declare module 'vue-router/auto-routes' {
     'components-timeline': RouteRecordInfo<'components-timeline', '/components/timeline', Record<never, never>, Record<never, never>>,
     'components-tooltip': RouteRecordInfo<'components-tooltip', '/components/tooltip', Record<never, never>, Record<never, never>>,
     'compras': RouteRecordInfo<'compras', '/compras', Record<never, never>, Record<never, never>>,
+    'configuracion-sistema': RouteRecordInfo<'configuracion-sistema', '/configuracion-sistema', Record<never, never>, Record<never, never>>,
     'dashboard-inicio': RouteRecordInfo<'dashboard-inicio', '/dashboard-inicio', Record<never, never>, Record<never, never>>,
     'employee-home': RouteRecordInfo<'employee-home', '/employee-home', Record<never, never>, Record<never, never>>,
     'extensions-swiper': RouteRecordInfo<'extensions-swiper', '/extensions/swiper', Record<never, never>, Record<never, never>>,

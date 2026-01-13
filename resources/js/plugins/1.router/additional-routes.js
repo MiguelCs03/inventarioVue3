@@ -32,26 +32,8 @@ export const redirects = [
   },
 ]
 export const routes = [
-  {
-    path: '/apps-usuarios',
-    name: 'apps-usuarios',
-    component: () => import('@/pages/apps-usuarios.vue'),
-    meta: {
-      section: 'apps-usuarios', // Sección requerida para acceder
-      action: 'read',
-      subject: 'apps-usuarios',
-    },
-  },
-  {
-    path: '/apps-roles',
-    name: 'apps-roles',
-    component: () => import('@/pages/apps-roles.vue'),
-    meta: {
-      section: 'apps-roles',
-      action: 'read',
-      subject: 'apps-roles',
-    },
-  },
+  
+ 
   {
     path: '/apps/email/filter/:filter',
     name: 'apps-email-filter',
@@ -61,16 +43,7 @@ export const routes = [
       layoutWrapperClasses: 'layout-content-height-fixed',
     },
   },
-  {
-    path: '/dashboard-inicio',
-    name: 'dashboard-inicio',
-    component: () => import('@/pages/dashboard-inicio.vue'),
-    meta: {
-      section: 'dashboard-inicio', // Agregar sección
-      action: 'read',
-      subject: 'dashboard-inicio',
-    },
-  },
+  // dashboard-inicio se genera automáticamente desde /pages/dashboard-inicio.vue con definePage
   {
     path: '/apps/email/label/:label',
     name: 'apps-email-label',
@@ -92,54 +65,11 @@ export const routes = [
       layoutWrapperClasses: 'layout-content-height-fixed',
     },
   },
-  {
-    path: '/compras',
-    name: 'compras',
-    component: () => import('@/pages/compras.vue'),
-    meta: {
-      section: 'compras', // Sección requerida
-      action: 'read',
-      subject: 'compras',
-      navActiveLink: 'compras',
-      layoutWrapperClasses: 'layout-content-height-fixed',
-    },
-  },
-  {
-    path: '/perfil',
-    name: 'perfil',
-    component: () => import('@/pages/perfil.vue'),
-    meta: {
-      section: 'perfil', 
-      action: 'read',
-      subject: 'perfil',
-    },
-  },
+  
   // Ruta para clientes
-  {
-    path: '/clientes',
-    name: 'clientes',
-    component: () => import('@/pages/clientes.vue'),
-    meta: {
-      section: 'clientes',
-      action: 'read',
-      subject: 'clientes',
-      navActiveLink: 'clientes',
-      layoutWrapperClasses: 'layout-content-height-fixed',
-    },
-  },
+  
   // Ruta para ordenes
-  {
-    path: '/ordenes',
-    name: 'ordenes',
-    component: () => import('@/pages/ordenes.vue'),
-    meta: {
-      section: 'ordenes',
-      action: 'read',
-      subject: 'ordenes',
-      navActiveLink: 'ordenes',
-      layoutWrapperClasses: 'layout-content-height-fixed',
-    },
-  },
+ 
   // Rutas para gestión de grupos, marcas, subgrupos y unidades
   {
     path: '/apps/grupos',
@@ -189,5 +119,6 @@ export const routes = [
       layoutWrapperClasses: 'layout-content-height-fixed',
     },
   },
+  // La ruta /configuracion-sistema ahora se genera automáticamente desde /pages/configuracion-sistema.vue con definePage
   
 ]

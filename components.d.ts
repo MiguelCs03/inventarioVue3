@@ -379,6 +379,7 @@ declare module 'vue' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     ScrollToTop: typeof import('./resources/js/@core/components/ScrollToTop.vue')['default']
+    SelectorImagenModal: typeof import('./resources/js/components/SelectorImagenModal.vue')['default']
     ShareProjectDialog: typeof import('./resources/js/components/dialogs/ShareProjectDialog.vue')['default']
     Shortcuts: typeof import('./resources/js/@core/components/Shortcuts.vue')['default']
     TablePagination: typeof import('./resources/js/@core/components/TablePagination.vue')['default']
@@ -391,5 +392,6 @@ declare module 'vue' {
     TwoFactorAuthDialog: typeof import('./resources/js/components/dialogs/TwoFactorAuthDialog.vue')['default']
     UserInfoEditDialog: typeof import('./resources/js/components/dialogs/UserInfoEditDialog.vue')['default']
     UserUpgradePlanDialog: typeof import('./resources/js/components/dialogs/UserUpgradePlanDialog.vue')['default']
+    VueApexCharts: typeof import('vue3-apexcharts')['default']
   }
 }

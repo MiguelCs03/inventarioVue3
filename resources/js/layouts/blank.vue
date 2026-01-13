@@ -27,13 +27,17 @@ watch([
     class="layout-wrapper layout-blank"
     data-allow-mismatch
   >
-    <RouterView #="{Component}">
+    <RouterView v-slot="{ Component }">
       <Suspense
         :timeout="0"
         @fallback="isFallbackStateActive = true"
         @resolve="isFallbackStateActive = false"
       >
-        <Component :is="Component" />
+        <template #default>
+          <div class="suspense-wrapper">
+            <Component :is="Component" />
+          </div>
+        </template>
       </Suspense>
     </RouterView>
   </div>

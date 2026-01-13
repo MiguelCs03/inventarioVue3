@@ -361,6 +361,8 @@
     "watchTriggerable": true,
     "watchWithFilter": true,
     "whenever": true,
-    "usePermissions": true
+    "usePermissions": true,
+    "useConfiguracion": true,
+    "useImagenesSistema": true
   }
 }

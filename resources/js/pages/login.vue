@@ -1,4 +1,3 @@
-<!-- ❗Errors in the form are set on line 60 -->
 <script setup>
 import AuthProvider from '@/views/pages/authentication/AuthProvider.vue'
 import { useGenerateImageVariant } from '@core/composable/useGenerateImageVariant'
@@ -11,6 +10,8 @@ import authV2MaskLight from '@images/pages/misc-mask-light.png'
 import { VNodeRenderer } from '@layouts/components/VNodeRenderer'
 import { themeConfig } from '@themeConfig'
 import { VForm } from 'vuetify/components/VForm'
+import { useConfiguracion } from '@/composables/useConfiguracion'
+import { useImagenesSistema } from '@/composables/useImagenesSistema'
 
 const authThemeImg = useGenerateImageVariant(authV2LoginIllustrationLight, authV2LoginIllustrationDark, authV2LoginIllustrationBorderedLight, authV2LoginIllustrationBorderedDark, true)
 const authThemeMask = useGenerateImageVariant(authV2MaskLight, authV2MaskDark)
@@ -43,6 +44,36 @@ const rememberMe = ref(false)
 
 import axios from 'axios'
 import { fetchMenus } from '@/store/menu'
+
+// Cargar configuración de la BD
+const { configuracion, obtenerConfiguracionPublica } = useConfiguracion()
+// Cargar imágenes activas públicas (login, logo, favicon, loader)
+const { imagenesActivas, obtenerTodasActivas } = useImagenesSistema()
+
+const nombreEmpresa = computed(() => configuracion.value?.nombre_empresa || themeConfig.app.title)
+
+onMounted(async () => {
+  // Obtener configuración pública y las imágenes activas
+  await Promise.all([obtenerConfiguracionPublica(), obtenerTodasActivas()])
+
+  // Actualizar título del navegador
+  if (configuracion.value?.titulo_navegador) {
+    document.title = configuracion.value.titulo_navegador
+  }
+})
+
+// Si existe una imagen activa subida para la ilustración de login, usarla
+const loginIllustration = computed(() => {
+  const activo = imagenesActivas.value?.login_ilustracion
+  if (activo && activo.ruta) return `/storage/${activo.ruta}`
+  return authThemeImg
+})
+
+// Logo pequeño que aparece en el header del login (usar `logo_header` si existe)
+const smallLogoSrc = computed(() => {
+  const img = imagenesActivas.value?.logo_header
+  return img && img.ruta ? `/storage/${img.ruta}` : null
+})
 
 const login = async () => {
   try {
@@ -90,9 +121,14 @@ const onSubmit = () => {
 <template>
   <RouterLink to="/">
     <div class="auth-logo d-flex align-center gap-x-3">
-      <VNodeRenderer :nodes="themeConfig.app.logo" />
+      <template v-if="smallLogoSrc">
+        <img :src="smallLogoSrc" alt="logo" style="max-height:36px;" />
+      </template>
+      <template v-else>
+        <VNodeRenderer :nodes="themeConfig.app.logo" />
+      </template>
       <h1 class="auth-title">
-        {{ themeConfig.app.title }}
+        {{ nombreEmpresa }}
       </h1>
     </div>
   </RouterLink>
@@ -112,7 +148,7 @@ const onSubmit = () => {
         >
           <VImg
             max-width="613"
-            :src="authThemeImg"
+            :src="loginIllustration"
             class="auth-illustration mt-16 mb-2"
           />
         </div>
@@ -139,7 +175,7 @@ const onSubmit = () => {
       >
         <VCardText>
           <h4 class="text-h4 mb-1">
-            Bienvenido a  <span class="text-capitalize"> {{ themeConfig.app.title }} </span>! 👋🏻
+            Bienvenido a  <span class="text-capitalize"> {{ nombreEmpresa }} </span>! 👋🏻
           </h4>
         
         </VCardText>

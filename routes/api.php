@@ -173,3 +173,17 @@ Route::apiResource('grupos', GrupoController::class);
 Route::apiResource('marcas', MarcaController::class);
 Route::apiResource('subgrupos', SubGrupoController::class);
 Route::apiResource('unidades', UnidadController::class);
+
+//Rutas para configuración del sistema
+Route::get('/configuracion', [App\Http\Controllers\ConfiguracionController::class, 'index']);
+Route::put('/configuracion', [App\Http\Controllers\ConfiguracionController::class, 'update']);
+Route::get('/configuracion/publica', [App\Http\Controllers\ConfiguracionController::class, 'publica']);
+//Rutas para la gestión de imagenes del sistema 
+// Rutas para la gestión de imagenes del sistema
+// Nota: la ruta específica `/activas` debe ir antes de la ruta con parámetro `{uso}`
+// para evitar que Laravel capture "activas" como un valor de `{uso}`.
+Route::get('/imagenes-sistema/activas', [App\Http\Controllers\ImagenSistemaController::class, 'todasActivas']);
+Route::get('/imagenes-sistema/{uso}', [App\Http\Controllers\ImagenSistemaController::class, 'index']);
+Route::post('/imagenes-sistema/{uso}', [App\Http\Controllers\ImagenSistemaController::class, 'store']);
+Route::put('/imagenes-sistema/{id}/activar', [App\Http\Controllers\ImagenSistemaController::class, 'activar']);
+Route::delete('/imagenes-sistema/{id}', [App\Http\Controllers\ImagenSistemaController::class, 'destroy']);
